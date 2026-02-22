@@ -1,0 +1,31 @@
+{
+  "cp": 1,
+  "custom_metas": null,
+  "dp": 4,
+  "metas": {
+    "consumed_tokens_total": 3145728000,
+    "consumed_train_samples": 3072000,
+    "data_stages": [
+      {
+        "consumed_tokens_per_dataset_folder": {
+          "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_COSMO/part_0": 98304000,
+          "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_FINEWEB/part_0": 540656640,
+          "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_FINEWEB/part_1": 540656640,
+          "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_OPENMATH/part_0": 540655616,
+          "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_SLIMPYJAMA/part_0": 49136640,
+          "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_STACKEX/part_0": 442383360,
+          "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_STACKEX/part_1": 442415104,
+          "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_STARCODER/part_0": 491520000
+        },
+        "consumed_train_samples": 3072000,
+        "name": "Stage 3",
+        "sequence_length": 1024,
+        "start_training_step": 1
+      }
+    ],
+    "last_stage_idx": 0,
+    "last_train_step": 12000
+  },
+  "tp": 1,
+  "version": "1.5"
+}

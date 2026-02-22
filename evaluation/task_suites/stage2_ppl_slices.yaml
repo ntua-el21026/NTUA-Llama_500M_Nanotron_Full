@@ -1,0 +1,101 @@
+version: 1
+sequence_length: 1024
+target_tokens_total: 55000000
+slices:
+  - name: general_web
+    hf_dataset: allenai/c4
+    hf_config: en
+    split: train
+    text_field: text
+    streaming: true
+    shuffle: true
+    seed: 42
+    target_tokens: 5000000
+  - name: code
+    hf_dataset: codeparrot/codeparrot-clean
+    split: train
+    text_field: content
+    streaming: true
+    shuffle: true
+    seed: 42
+    target_tokens: 5000000
+  - name: books_newslike
+    hf_dataset: wikitext
+    hf_config: wikitext-103-raw-v1
+    split: train
+    text_field: text
+    streaming: false
+    shuffle: true
+    seed: 42
+    target_tokens: 5000000
+  - name: math_finemath3plus
+    hf_dataset: HuggingFaceTB/finemath
+    hf_config: finemath-3plus
+    split: train
+    text_field: text
+    streaming: true
+    shuffle: true
+    seed: 42
+    target_tokens: 5000000
+  - name: math_infiwebmath3plus
+    hf_dataset: HuggingFaceTB/finemath
+    hf_config: infiwebmath-3plus
+    split: train
+    text_field: text
+    streaming: true
+    shuffle: true
+    seed: 42
+    target_tokens: 5000000
+  - name: web_fineweb_edu_sample10bt
+    hf_dataset: HuggingFaceFW/fineweb-edu
+    hf_config: sample-10BT
+    split: train
+    text_field: text
+    streaming: true
+    shuffle: true
+    seed: 42
+    target_tokens: 5000000
+  - name: wiki_en_20231101
+    hf_dataset: wikimedia/wikipedia
+    hf_config: 20231101.en
+    split: train
+    text_field: text
+    streaming: true
+    shuffle: true
+    seed: 42
+    target_tokens: 5000000
+  - name: math_finemath4plus
+    hf_dataset: HuggingFaceTB/finemath
+    hf_config: finemath-4plus
+    split: train
+    text_field: text
+    streaming: true
+    shuffle: true
+    seed: 42
+    target_tokens: 5000000
+  - name: math_infiwebmath4plus
+    hf_dataset: HuggingFaceTB/finemath
+    hf_config: infiwebmath-4plus
+    split: train
+    text_field: text
+    streaming: true
+    shuffle: true
+    seed: 42
+    target_tokens: 5000000
+  - name: code_stackv2_edu_filtered
+    hf_dataset: common-pile/stackv2_edu_filtered
+    split: train
+    text_field: content
+    streaming: true
+    shuffle: true
+    seed: 42
+    target_tokens: 5000000
+  - name: code_starcoder2data_extras_lhq
+    hf_dataset: bigcode/starcoder2data-extras
+    hf_config: lhq
+    split: train
+    text_field: content
+    streaming: true
+    shuffle: true
+    seed: 42
+    target_tokens: 5000000

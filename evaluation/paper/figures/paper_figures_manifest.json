@@ -1,0 +1,22 @@
+{
+  "stage1_tokens_per_step": 262144,
+  "stage2_tokens_per_step": 262144,
+  "stage3_tokens_per_step": 262144,
+  "sft_tokens_per_step": 16384,
+  "stage1_total_tokens": 14024704000,
+  "stage2_total_tokens": 5955125248,
+  "stage3_total_tokens": 4000317440,
+  "sft_total_tokens": 81920000,
+  "stage2_bridge_step": 50000,
+  "stage3_bridge_step": 22000,
+  "stage4_bridge_step": 12000,
+  "files_generated": [
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/paper/figures/pretrain_stages123/pretrain_tier2_per_slice_vs_tokens.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/paper/figures/pretrain_stages123/pretrain_tier3_semantic_categories_vs_tokens.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/paper/figures/pretrain_stages123/pretrain_tier2_macro_ppl_vs_tokens.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/paper/figures/pretrain_stages123/pretrain_tier3_macro_cf_vs_tokens.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/paper/figures/sft_stage4/sft_tier2_macro_ppl_vs_tokens.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/paper/figures/sft_stage4/sft_tier3_macro_cf_vs_tokens.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/paper/figures/sft_stage4/sft_prompt_category_pass_bridge_vs_final.png"
+  ]
+}

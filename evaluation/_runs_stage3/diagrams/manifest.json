@@ -1,0 +1,101 @@
+{
+  "stage3_results_root": "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/eval_results/by_checkpoint",
+  "stage2_results_root": "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage2/eval_results/by_checkpoint",
+  "stage1_results_root": "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage1/eval_results/by_checkpoint",
+  "output_root": "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams",
+  "stage3_steps_all": [
+    2000,
+    4000,
+    6000,
+    8000,
+    10000,
+    12000,
+    22000
+  ],
+  "stage3_steps_plotted": [
+    2000,
+    4000,
+    6000,
+    8000,
+    10000,
+    12000
+  ],
+  "baseline_step": 22000,
+  "stage2_steps_all": [
+    2000,
+    6000,
+    10000,
+    14000,
+    18000,
+    22000,
+    50000
+  ],
+  "stage2_steps": [
+    2000,
+    6000,
+    10000,
+    14000,
+    18000,
+    22000
+  ],
+  "stage1_steps": [
+    2000,
+    10000,
+    20000,
+    32000,
+    40000,
+    50000
+  ],
+  "snapshots_requested": [
+    2000,
+    8000,
+    12000
+  ],
+  "compare_steps_requested": [
+    2000,
+    10000
+  ],
+  "stage_compare_enabled": true,
+  "stage_compare_error": "",
+  "files_generated": [
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier2/series/tier2_ppl_by_slice_vs_step.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier3/series/tier3_acc_by_task_vs_step.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier2/macro/tier2_macro_ppl_vs_step.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier3/macro/tier3_macro_acc_vs_step.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier2/relative/tier2_relative_vs_step2000.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier3/relative/tier3_relative_vs_step2000.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier2/relative/tier2_macro_relative_vs_step2000.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier3/relative/tier3_macro_relative_vs_step2000.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier3/support/tier3_task_support_n.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier2/snapshots/tier2_step_2000_by_slice.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier2/snapshots/tier2_step_8000_by_slice.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier2/snapshots/tier2_step_12000_by_slice.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier3/snapshots/tier3_step_2000_by_task.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier3/snapshots/tier3_step_8000_by_task.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier3/snapshots/tier3_step_12000_by_task.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier2/domains/tier2_domain_early_mid_late.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier3/domains/tier3_domain_early_mid_late.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier2/deltas/tier2_delta_step_12000_minus_2000_by_slice.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier3/deltas/tier3_delta_step_12000_minus_2000_by_task.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/cross_tier/tradeoff/tier2_vs_tier3_tradeoff.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier2/reasoning/tier2_reasoning_ppl_by_slice_vs_step.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier2/reasoning/tier2_anchor_hq_reasoning_macro_ppl_vs_step.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/tier2/reasoning/tier2_anchor_hq_reasoning_relative_vs_baseline.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/cross_tier/objective/stage3_objective_quadrant_vs_baseline.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/cross_tier/objective/stage3_reasoning_objective_quadrant_vs_baseline.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/stage_compare/bridge/stage3_vs_stage2_bridge_macro_trends.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/stage_compare/bridge/stage3_minus_stage2_bridge_macro_delta_by_step.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/stage_compare/three_stage/tier2/stage1_vs_stage2_vs_stage3_shared_macro_ppl_vs_step.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/stage_compare/three_stage/tier3/stage1_vs_stage2_vs_stage3_macro_acc_vs_step.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/stage_compare/three_stage/summary/stage123_macro_overlap_steps.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/stage_compare/three_stage/tier2/stage123_shared_slice_ppl_step_10000.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/stage_compare/three_stage/tier3/stage123_task_acc_step_10000.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/stage_compare/three_stage/summary/stage3_minus_stage2_and_stage1_macro_delta_overlap.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/stage_compare/three_stage/summary/stage3_objective_quadrants_vs_stage1_stage2_overlap.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/stage_compare/three_stage/summary/stage3_objective_pass_fail_overlap.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/stage_compare/three_stage/tier2/stage3_minus_stage2_shared_slice_ppl_delta_overlap.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/stage_compare/three_stage/tier2/stage3_minus_stage1_shared_slice_ppl_delta_overlap.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/stage_compare/three_stage/tier3/stage3_minus_stage2_task_acc_delta_overlap.png",
+    "/home/peppasmich/Leonardo/Smol_Project/evaluation/_runs_stage3/diagrams/stage_compare/three_stage/tier3/stage3_minus_stage1_task_acc_delta_overlap.png"
+  ]
+}

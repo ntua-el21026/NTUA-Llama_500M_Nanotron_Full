@@ -1,0 +1,70 @@
+version: 1
+subset_size: 12000
+seed: 42
+tasks:
+  - name: hellaswag
+    hf_dataset: hellaswag
+    split: validation
+    streaming: false
+    shuffle: true
+  - name: piqa
+    hf_dataset: piqa
+    split: validation
+    streaming: false
+    shuffle: true
+  - name: winogrande
+    hf_dataset: winogrande
+    hf_config: winogrande_xl
+    split: validation
+    streaming: false
+    shuffle: true
+  - name: arc_easy
+    hf_dataset: ai2_arc
+    hf_config: ARC-Easy
+    split: validation
+    streaming: false
+    shuffle: true
+  - name: openbookqa
+    hf_dataset: openbookqa
+    hf_config: main
+    split: validation
+    streaming: false
+    shuffle: true
+  - name: commonsense_qa
+    hf_dataset: tau/commonsense_qa
+    split: validation
+    streaming: false
+    shuffle: true
+  - name: social_i_qa
+    hf_dataset: allenai/social_i_qa
+    split: validation
+    streaming: false
+    shuffle: true
+  - name: sciq
+    hf_dataset: allenai/sciq
+    split: validation
+    streaming: false
+    shuffle: true
+  - name: qasc
+    hf_dataset: allenai/qasc
+    split: validation
+    streaming: false
+    shuffle: true
+  - name: copa
+    hf_dataset: aps/super_glue
+    hf_config: copa
+    split: validation
+    streaming: false
+    shuffle: true
+  - name: mmlu
+    hf_dataset: cais/mmlu
+    hf_config: all
+    split: validation
+    streaming: false
+    shuffle: true
+  - name: arc_challenge
+    hf_dataset: ai2_arc
+    hf_config: ARC-Challenge
+    split: validation
+    streaming: false
+    shuffle: true

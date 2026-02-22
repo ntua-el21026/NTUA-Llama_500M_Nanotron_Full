@@ -1,0 +1,109 @@
+general:
+  project: pretrain_stage3
+  run: run_32layers_4B
+  seed: 42
+  ignore_sanity_checks: true
+
+model:
+  make_vocab_size_divisible_by: 128
+  model_config:
+    is_llama_config: true
+    hidden_size: 1024
+    num_hidden_layers: 32       
+    num_attention_heads: 16
+    num_key_value_heads: 4      # GQA
+    intermediate_size: 2816
+    max_position_embeddings: 2048
+    hidden_act: silu
+    rms_norm_eps: 1.0e-05
+    rope_theta: 10000.0
+    tie_word_embeddings: true
+    vocab_size: 128256
+    initializer_range: 0.02
+  init_method:
+    std: 0.02
+
+optimizer:
+  accumulate_grad_in_fp32: true
+  clip_grad: 1.0
+  learning_rate_scheduler:
+    learning_rate: 0.00005
+    lr_decay_style: cosine
+    lr_warmup_steps: 1000
+    lr_warmup_style: linear
+    min_decay_lr: 5.0e-06 # Δεν μηδενίζουμε για να συνεχίσουμε Stage 2
+  optimizer_factory:
+    name: adamW
+    torch_adam_is_fused: true
+    adam_beta1: 0.9
+    adam_beta2: 0.95
+    adam_eps: 1.0e-08
+  weight_decay: 0.1
+  zero_stage: 0
+
+parallelism:
+  dp: 4
+  tp: 1
+  pp: 1
+  tp_mode: ALL_REDUCE
+  recompute_layer: true
+
+data_stages:
+- name: Stage 3
+  start_training_step: 1
+  data:
+    dataset:
+      dataset_folder:
+        - "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_COSMO/part_0"
+        - "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_FINEWEB/part_0"
+        - "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_FINEWEB/part_1"
+        - "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_STARCODER/part_0"
+        - "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_SLIMPYJAMA/part_0"
+        - "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_OPENMATH/part_0"
+        - "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_STACKEX/part_0"
+        - "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_STACKEX/part_1"
+      dataset_weights:
+        - 0.03125
+        - 0.17187
+        - 0.17187
+        - 0.15625
+        - 0.01562
+        - 0.17187
+        - 0.14063
+        - 0.14064
+      vocab_size: 128256
+      tokenizer_name: "meta-llama/Meta-Llama-3-8B"
+      token_size_in_bytes: 4
+    num_loading_workers: 8
+    seed: 42
+
+tokens:
+  sequence_length: 1024
+  micro_batch_size: 4
+  batch_accumulation_per_replica: 16
+  
+  train_steps: 15260
+  
+  val_check_interval: -1
+  limit_val_batches: 0
+
+tokenizer:
+  tokenizer_name_or_path: meta-llama/Meta-Llama-3-8B
+  tokenizer_max_length: null
+  tokenizer_revision: null
+
+checkpoints:
+  checkpoint_interval: 2000
+  checkpoints_path: /leonardo_scratch/large/userexternal/mpeppas0/ckpts/stage3
+  save_initial_state: false
+  checkpoints_path_is_shared_file_system: true
+  resume_checkpoint_path: /leonardo_scratch/large/userexternal/mpeppas0/ckpts/stage2
+  load_optimizer: false
+  load_lr_scheduler: false
+
+logging:
+  iteration_step_info_interval: 10
+  log_level: info
+
+  log_level_replica: info
+

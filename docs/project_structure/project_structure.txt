@@ -1,0 +1,1462 @@
+NTUA-Llama_500M_Nanotron_Full/
+|-- config/
+|   |-- config_stage1.yaml
+|   |-- config_stage1_16L.yaml
+|   |-- config_stage2.yaml
+|   |-- config_stage3.yaml
+|   |-- config_tiny_llama.yaml
+|   |-- DATASET_STAGE_2.yaml
+|   |-- DATASET_STAGE_3.yaml
+|   |-- README.md
+|   |-- sft_smoke_hf.yaml
+|   |-- sft_stage3_smoltalk.yaml
+|   |-- sft_stage3_smoltalk_preproc.yaml
+|   |-- sft_tinyllama_smoke.yaml
+|   |-- smoke_resume_checkpoint.yaml
+|   `-- smoke_save_checkpoint.yaml
+|-- docs/
+|   |-- paper/
+|   |   |-- main.tex
+|   |   `-- Report.pdf
+|   |-- project_analytics/
+|   |   |-- project_analytics.py
+|   |   `-- project_analytics.txt
+|   |-- project_structure/
+|   |   |-- project_structure.py
+|   |   `-- project_structure.txt
+|   |-- maintain.py
+|   `-- README.md
+|-- evaluation/
+|   |-- _runs_stage2/
+|   |   |-- diagrams/
+|   |   |   |-- cross_tier/
+|   |   |   |   |-- objective/
+|   |   |   |   |   `-- stage2_objective_quadrant_vs_baseline.png
+|   |   |   |   `-- tradeoff/
+|   |   |   |       `-- tier2_vs_tier3_tradeoff.png
+|   |   |   |-- stage_compare/
+|   |   |   |   |-- bridge/
+|   |   |   |   |   |-- stage2_minus_stage1_bridge_macro_delta_by_step.png
+|   |   |   |   |   `-- stage2_vs_stage1_bridge_macro_trends.png
+|   |   |   |   |-- summary/
+|   |   |   |   |   `-- stage2_minus_stage1_macro_delta_overlap_steps.png
+|   |   |   |   |-- tier2/
+|   |   |   |   |   |-- stage1_vs_stage2_shared_macro_ppl_vs_step.png
+|   |   |   |   |   |-- stage1_vs_stage2_shared_slice_ppl_step_10000.png
+|   |   |   |   |   `-- stage2_minus_stage1_shared_slice_ppl_delta_overlap.png
+|   |   |   |   `-- tier3/
+|   |   |   |       |-- stage1_vs_stage2_macro_acc_vs_step.png
+|   |   |   |       |-- stage1_vs_stage2_task_acc_step_10000.png
+|   |   |   |       `-- stage2_minus_stage1_task_acc_delta_overlap.png
+|   |   |   |-- tier2/
+|   |   |   |   |-- deltas/
+|   |   |   |   |   `-- tier2_delta_step_22000_minus_2000_by_slice.png
+|   |   |   |   |-- domains/
+|   |   |   |   |   `-- tier2_domain_early_mid_late.png
+|   |   |   |   |-- hq/
+|   |   |   |   |   |-- tier2_anchor_vs_hq_macro_ppl_vs_step.png
+|   |   |   |   |   |-- tier2_anchor_vs_hq_relative_vs_step2000.png
+|   |   |   |   |   `-- tier2_hq_ppl_by_slice_vs_step.png
+|   |   |   |   |-- macro/
+|   |   |   |   |   `-- tier2_macro_ppl_vs_step.png
+|   |   |   |   |-- relative/
+|   |   |   |   |   |-- tier2_macro_relative_vs_step2000.png
+|   |   |   |   |   `-- tier2_relative_vs_step2000.png
+|   |   |   |   |-- series/
+|   |   |   |   |   `-- tier2_ppl_by_slice_vs_step.png
+|   |   |   |   `-- snapshots/
+|   |   |   |       |-- tier2_step_10000_by_slice.png
+|   |   |   |       |-- tier2_step_2000_by_slice.png
+|   |   |   |       `-- tier2_step_22000_by_slice.png
+|   |   |   |-- tier3/
+|   |   |   |   |-- deltas/
+|   |   |   |   |   `-- tier3_delta_step_22000_minus_2000_by_task.png
+|   |   |   |   |-- domains/
+|   |   |   |   |   `-- tier3_domain_early_mid_late.png
+|   |   |   |   |-- macro/
+|   |   |   |   |   `-- tier3_macro_acc_vs_step.png
+|   |   |   |   |-- relative/
+|   |   |   |   |   |-- tier3_macro_relative_vs_step2000.png
+|   |   |   |   |   `-- tier3_relative_vs_step2000.png
+|   |   |   |   |-- series/
+|   |   |   |   |   `-- tier3_acc_by_task_vs_step.png
+|   |   |   |   |-- snapshots/
+|   |   |   |   |   |-- tier3_step_10000_by_task.png
+|   |   |   |   |   |-- tier3_step_2000_by_task.png
+|   |   |   |   |   `-- tier3_step_22000_by_task.png
+|   |   |   |   `-- support/
+|   |   |   |       `-- tier3_task_support_n.png
+|   |   |   |-- generate_stage2_diagrams.py
+|   |   |   |-- manifest.json
+|   |   |   `-- README.md
+|   |   `-- eval_results/
+|   |       `-- by_checkpoint/
+|   |           |-- step_10000/
+|   |           |   |-- tier2_ppl.json
+|   |           |   `-- tier3_cf.json
+|   |           |-- step_14000/
+|   |           |   |-- tier2_ppl.json
+|   |           |   `-- tier3_cf.json
+|   |           |-- step_18000/
+|   |           |   |-- tier2_ppl.json
+|   |           |   `-- tier3_cf.json
+|   |           |-- step_2000/
+|   |           |   |-- tier2_ppl.json
+|   |           |   `-- tier3_cf.json
+|   |           |-- step_22000/
+|   |           |   |-- tier2_ppl.json
+|   |           |   `-- tier3_cf.json
+|   |           |-- step_50000/
+|   |           |   |-- tier2_ppl.json
+|   |           |   `-- tier3_cf.json
+|   |           `-- step_6000/
+|   |               |-- tier2_ppl.json
+|   |               `-- tier3_cf.json
+|   |-- _runs_stage3/
+|   |   |-- diagrams/
+|   |   |   |-- cross_tier/
+|   |   |   |   |-- objective/
+|   |   |   |   |   |-- stage3_objective_quadrant_vs_baseline.png
+|   |   |   |   |   `-- stage3_reasoning_objective_quadrant_vs_baseline.png
+|   |   |   |   `-- tradeoff/
+|   |   |   |       `-- tier2_vs_tier3_tradeoff.png
+|   |   |   |-- stage_compare/
+|   |   |   |   |-- bridge/
+|   |   |   |   |   |-- stage3_minus_stage2_bridge_macro_delta_by_step.png
+|   |   |   |   |   `-- stage3_vs_stage2_bridge_macro_trends.png
+|   |   |   |   `-- three_stage/
+|   |   |   |       |-- summary/
+|   |   |   |       |   |-- stage123_macro_overlap_steps.png
+|   |   |   |       |   |-- stage3_minus_stage2_and_stage1_macro_delta_overlap.png
+|   |   |   |       |   |-- stage3_objective_pass_fail_overlap.png
+|   |   |   |       |   `-- stage3_objective_quadrants_vs_stage1_stage2_overlap.png
+|   |   |   |       |-- tier2/
+|   |   |   |       |   |-- stage123_shared_slice_ppl_step_10000.png
+|   |   |   |       |   |-- stage1_vs_stage2_vs_stage3_shared_macro_ppl_vs_step.png
+|   |   |   |       |   |-- stage3_minus_stage1_shared_slice_ppl_delta_overlap.png
+|   |   |   |       |   `-- stage3_minus_stage2_shared_slice_ppl_delta_overlap.png
+|   |   |   |       `-- tier3/
+|   |   |   |           |-- stage123_task_acc_step_10000.png
+|   |   |   |           |-- stage1_vs_stage2_vs_stage3_macro_acc_vs_step.png
+|   |   |   |           |-- stage3_minus_stage1_task_acc_delta_overlap.png
+|   |   |   |           `-- stage3_minus_stage2_task_acc_delta_overlap.png
+|   |   |   |-- tier2/
+|   |   |   |   |-- deltas/
+|   |   |   |   |   `-- tier2_delta_step_12000_minus_2000_by_slice.png
+|   |   |   |   |-- domains/
+|   |   |   |   |   `-- tier2_domain_early_mid_late.png
+|   |   |   |   |-- macro/
+|   |   |   |   |   `-- tier2_macro_ppl_vs_step.png
+|   |   |   |   |-- reasoning/
+|   |   |   |   |   |-- tier2_anchor_hq_reasoning_macro_ppl_vs_step.png
+|   |   |   |   |   |-- tier2_anchor_hq_reasoning_relative_vs_baseline.png
+|   |   |   |   |   `-- tier2_reasoning_ppl_by_slice_vs_step.png
+|   |   |   |   |-- relative/
+|   |   |   |   |   |-- tier2_macro_relative_vs_step2000.png
+|   |   |   |   |   `-- tier2_relative_vs_step2000.png
+|   |   |   |   |-- series/
+|   |   |   |   |   `-- tier2_ppl_by_slice_vs_step.png
+|   |   |   |   `-- snapshots/
+|   |   |   |       |-- tier2_step_12000_by_slice.png
+|   |   |   |       |-- tier2_step_2000_by_slice.png
+|   |   |   |       `-- tier2_step_8000_by_slice.png
+|   |   |   |-- tier3/
+|   |   |   |   |-- deltas/
+|   |   |   |   |   `-- tier3_delta_step_12000_minus_2000_by_task.png
+|   |   |   |   |-- domains/
+|   |   |   |   |   `-- tier3_domain_early_mid_late.png
+|   |   |   |   |-- macro/
+|   |   |   |   |   `-- tier3_macro_acc_vs_step.png
+|   |   |   |   |-- relative/
+|   |   |   |   |   |-- tier3_macro_relative_vs_step2000.png
+|   |   |   |   |   `-- tier3_relative_vs_step2000.png
+|   |   |   |   |-- series/
+|   |   |   |   |   `-- tier3_acc_by_task_vs_step.png
+|   |   |   |   |-- snapshots/
+|   |   |   |   |   |-- tier3_step_12000_by_task.png
+|   |   |   |   |   |-- tier3_step_2000_by_task.png
+|   |   |   |   |   `-- tier3_step_8000_by_task.png
+|   |   |   |   `-- support/
+|   |   |   |       `-- tier3_task_support_n.png
+|   |   |   |-- generate_stage3_diagrams.py
+|   |   |   |-- manifest.json
+|   |   |   `-- README.md
+|   |   `-- eval_results/
+|   |       `-- by_checkpoint/
+|   |           |-- step_10000/
+|   |           |   |-- tier2_ppl.json
+|   |           |   `-- tier3_cf.json
+|   |           |-- step_12000/
+|   |           |   |-- tier2_ppl.json
+|   |           |   `-- tier3_cf.json
+|   |           |-- step_2000/
+|   |           |   |-- tier2_ppl.json
+|   |           |   `-- tier3_cf.json
+|   |           |-- step_22000/
+|   |           |   |-- tier2_ppl.json
+|   |           |   `-- tier3_cf.json
+|   |           |-- step_4000/
+|   |           |   |-- tier2_ppl.json
+|   |           |   `-- tier3_cf.json
+|   |           |-- step_6000/
+|   |           |   |-- tier2_ppl.json
+|   |           |   `-- tier3_cf.json
+|   |           `-- step_8000/
+|   |               |-- tier2_ppl.json
+|   |               `-- tier3_cf.json
+|   |-- _runs_stage4/
+|   |   |-- diagrams/
+|   |   |   |-- cross_tier/
+|   |   |   |   |-- objective/
+|   |   |   |   |   |-- stage4_objective_pass_flags_vs_bridge.png
+|   |   |   |   |   |-- stage4_objective_quadrant_tier2_tier3_vs_bridge.png
+|   |   |   |   |   `-- stage4_objective_quadrant_tier2_tier4_vs_bridge.png
+|   |   |   |   `-- tradeoff/
+|   |   |   |       `-- tier2_vs_tier3_tradeoff.png
+|   |   |   |-- stage_compare/
+|   |   |   |   |-- bridge/
+|   |   |   |   |   |-- stage4_minus_stage3_bridge_macro_delta_by_step.png
+|   |   |   |   |   `-- stage4_vs_stage3_bridge_macro_trends.png
+|   |   |   |   `-- history/
+|   |   |   |       |-- stage1234_macro_delta_vs_previous.png
+|   |   |   |       `-- stage1234_macro_progression.png
+|   |   |   |-- tier2/
+|   |   |   |   |-- deltas/
+|   |   |   |   |   `-- tier2_delta_step_5000_minus_500_by_slice.png
+|   |   |   |   |-- domains/
+|   |   |   |   |   `-- tier2_domain_early_mid_late.png
+|   |   |   |   |-- macro/
+|   |   |   |   |   `-- tier2_macro_ppl_vs_step.png
+|   |   |   |   |-- reasoning/
+|   |   |   |   |   |-- tier2_anchor_hq_reasoning_macro_ppl_vs_step.png
+|   |   |   |   |   |-- tier2_anchor_hq_reasoning_relative_vs_bridge.png
+|   |   |   |   |   `-- tier2_reasoning_ppl_by_slice_vs_step.png
+|   |   |   |   |-- relative/
+|   |   |   |   |   |-- tier2_macro_relative_vs_step2000.png
+|   |   |   |   |   `-- tier2_relative_vs_step2000.png
+|   |   |   |   |-- series/
+|   |   |   |   |   `-- tier2_ppl_by_slice_vs_step.png
+|   |   |   |   `-- snapshots/
+|   |   |   |       |-- tier2_step_3500_by_slice.png
+|   |   |   |       |-- tier2_step_5000_by_slice.png
+|   |   |   |       `-- tier2_step_500_by_slice.png
+|   |   |   |-- tier3/
+|   |   |   |   |-- deltas/
+|   |   |   |   |   `-- tier3_delta_step_5000_minus_500_by_task.png
+|   |   |   |   |-- domains/
+|   |   |   |   |   `-- tier3_domain_early_mid_late.png
+|   |   |   |   |-- macro/
+|   |   |   |   |   `-- tier3_macro_acc_vs_step.png
+|   |   |   |   |-- objective/
+|   |   |   |   |   `-- tier3_group_macro_acc_vs_step.png
+|   |   |   |   |-- relative/
+|   |   |   |   |   |-- tier3_macro_relative_vs_step2000.png
+|   |   |   |   |   `-- tier3_relative_vs_step2000.png
+|   |   |   |   |-- series/
+|   |   |   |   |   `-- tier3_acc_by_task_vs_step.png
+|   |   |   |   |-- snapshots/
+|   |   |   |   |   |-- tier3_step_3500_by_task.png
+|   |   |   |   |   |-- tier3_step_5000_by_task.png
+|   |   |   |   |   `-- tier3_step_500_by_task.png
+|   |   |   |   `-- support/
+|   |   |   |       `-- tier3_task_support_n.png
+|   |   |   |-- tier4/
+|   |   |   |   |-- categories/
+|   |   |   |   |   |-- tier4_category_pass_rate_early_mid_late.png
+|   |   |   |   |   `-- tier4_category_pass_rate_vs_step.png
+|   |   |   |   |-- objective/
+|   |   |   |   |   `-- tier4_metric_delta_vs_stage3_bridge.png
+|   |   |   |   |-- prompts/
+|   |   |   |   |   |-- tier4_prompt_pass_heatmap.png
+|   |   |   |   |   `-- tier4_prompt_pass_rate_sorted.png
+|   |   |   |   `-- summary/
+|   |   |   |       |-- tier4_pass_fail_counts_vs_step.png
+|   |   |   |       `-- tier4_summary_metrics_vs_step.png
+|   |   |   |-- generate_stage4_diagrams.py
+|   |   |   `-- manifest.json
+|   |   `-- eval_results/
+|   |       `-- by_checkpoint/
+|   |           |-- step_12000/
+|   |           |   |-- tier2_ppl.json
+|   |           |   |-- tier3_cf.json
+|   |           |   |-- tier4_sft_native.json
+|   |           |   `-- tier4_sft_native_generations.jsonl
+|   |           |-- step_1500/
+|   |           |   |-- tier2_ppl.json
+|   |           |   |-- tier3_cf.json
+|   |           |   |-- tier4_sft_native.json
+|   |           |   `-- tier4_sft_native_generations.jsonl
+|   |           |-- step_3500/
+|   |           |   |-- tier2_ppl.json
+|   |           |   |-- tier3_cf.json
+|   |           |   |-- tier4_sft_native.json
+|   |           |   `-- tier4_sft_native_generations.jsonl
+|   |           |-- step_500/
+|   |           |   |-- tier2_ppl.json
+|   |           |   |-- tier3_cf.json
+|   |           |   |-- tier4_sft_native.json
+|   |           |   `-- tier4_sft_native_generations.jsonl
+|   |           `-- step_5000/
+|   |               |-- tier2_ppl.json
+|   |               |-- tier3_cf.json
+|   |               |-- tier4_sft_native.json
+|   |               `-- tier4_sft_native_generations.jsonl
+|   |-- paper/
+|   |   |-- figures/
+|   |   |   |-- pretrain_stage3_only/
+|   |   |   |   |-- stage3_tier2_macro_vs_tokens.png
+|   |   |   |   `-- stage3_tier3_macro_vs_tokens.png
+|   |   |   |-- pretrain_stages123/
+|   |   |   |   |-- pretrain_tier2_macro_ppl_vs_tokens.png
+|   |   |   |   |-- pretrain_tier2_per_slice_vs_tokens.png
+|   |   |   |   |-- pretrain_tier3_macro_cf_vs_tokens.png
+|   |   |   |   `-- pretrain_tier3_semantic_categories_vs_tokens.png
+|   |   |   |-- sft_stage4/
+|   |   |   |   |-- sft_prompt_category_pass_bridge_vs_final.png
+|   |   |   |   |-- sft_tier2_macro_ppl_vs_tokens.png
+|   |   |   |   `-- sft_tier3_macro_cf_vs_tokens.png
+|   |   |   `-- paper_figures_manifest.json
+|   |   `-- generate_paper_figures.py
+|   |-- task_suites/
+|   |   |-- stage1_cf_core.yaml
+|   |   |-- stage1_ppl_slices.yaml
+|   |   |-- stage2_cf_core.yaml
+|   |   |-- stage2_ppl_slices.yaml
+|   |   |-- stage3_cf_core.yaml
+|   |   |-- stage3_ppl_slices.yaml
+|   |   |-- stage4_cf_core.yaml
+|   |   |-- stage4_ppl_slices.yaml
+|   |   `-- stage4_sft_native.yaml
+|   |-- DETAILS.md
+|   |-- README.md
+|   |-- run_eval_stage1.py
+|   |-- run_eval_stage2.py
+|   |-- run_eval_stage3.py
+|   `-- run_eval_stage4.py
+|-- final_model/
+|   |-- sft_stage3_smoltalk_run1_5000_modelonly/
+|   |   |-- model/
+|   |   |   |-- model/
+|   |   |   |   |-- decoder/
+|   |   |   |   |   |-- 0/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 1/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 10/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 11/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 12/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 13/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 14/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 15/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 16/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 17/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 18/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 19/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 2/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 20/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 21/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 22/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 23/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 24/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 25/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 26/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 27/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 28/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 29/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 3/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 30/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 31/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 4/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 5/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 6/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 7/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   |-- 8/
+|   |   |   |   |   |   `-- pp_block/
+|   |   |   |   |   |       |-- attn/
+|   |   |   |   |   |       |   |-- o_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- qkv_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |-- input_layernorm/
+|   |   |   |   |   |       |   `-- model_weight.safetensors
+|   |   |   |   |   |       |-- mlp/
+|   |   |   |   |   |       |   |-- down_proj/
+|   |   |   |   |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       |   `-- gate_up_proj/
+|   |   |   |   |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |   |       `-- post_attention_layernorm/
+|   |   |   |   |   |           `-- model_weight.safetensors
+|   |   |   |   |   `-- 9/
+|   |   |   |   |       `-- pp_block/
+|   |   |   |   |           |-- attn/
+|   |   |   |   |           |   |-- o_proj/
+|   |   |   |   |           |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |           |   `-- qkv_proj/
+|   |   |   |   |           |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |           |-- input_layernorm/
+|   |   |   |   |           |   `-- model_weight.safetensors
+|   |   |   |   |           |-- mlp/
+|   |   |   |   |           |   |-- down_proj/
+|   |   |   |   |           |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |           |   `-- gate_up_proj/
+|   |   |   |   |           |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   |   |           `-- post_attention_layernorm/
+|   |   |   |   |               `-- model_weight.safetensors
+|   |   |   |   |-- final_layer_norm/
+|   |   |   |   |   `-- pp_block/
+|   |   |   |   |       `-- model_weight.safetensors
+|   |   |   |   `-- token_position_embeddings/
+|   |   |   |       `-- pp_block/
+|   |   |   |           `-- token_embedding/
+|   |   |   |               `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |   `-- config.json
+|   |   |-- checkpoint_metadata.json
+|   |   `-- model_config.json
+|   |-- stage3_12000_modelonly/
+|   |   |-- model/
+|   |   |   `-- model/
+|   |   |       |-- decoder/
+|   |   |       |   |-- 0/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 1/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 10/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 11/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 12/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 13/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 14/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 15/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 16/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 17/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 18/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 19/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 2/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 20/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 21/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 22/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 23/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 24/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 25/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 26/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 27/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 28/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 29/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 3/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 30/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 31/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 4/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 5/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 6/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 7/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   |-- 8/
+|   |   |       |   |   `-- pp_block/
+|   |   |       |   |       |-- attn/
+|   |   |       |   |       |   |-- o_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- qkv_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |-- input_layernorm/
+|   |   |       |   |       |   `-- model_weight.safetensors
+|   |   |       |   |       |-- mlp/
+|   |   |       |   |       |   |-- down_proj/
+|   |   |       |   |       |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       |   `-- gate_up_proj/
+|   |   |       |   |       |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |   |       `-- post_attention_layernorm/
+|   |   |       |   |           `-- model_weight.safetensors
+|   |   |       |   `-- 9/
+|   |   |       |       `-- pp_block/
+|   |   |       |           |-- attn/
+|   |   |       |           |   |-- o_proj/
+|   |   |       |           |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |           |   `-- qkv_proj/
+|   |   |       |           |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |           |-- input_layernorm/
+|   |   |       |           |   `-- model_weight.safetensors
+|   |   |       |           |-- mlp/
+|   |   |       |           |   |-- down_proj/
+|   |   |       |           |   |   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |           |   `-- gate_up_proj/
+|   |   |       |           |       `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |       |           `-- post_attention_layernorm/
+|   |   |       |               `-- model_weight.safetensors
+|   |   |       |-- final_layer_norm/
+|   |   |       |   `-- pp_block/
+|   |   |       |       `-- model_weight.safetensors
+|   |   |       `-- token_position_embeddings/
+|   |   |           `-- pp_block/
+|   |   |               `-- token_embedding/
+|   |   |                   `-- model_weight_pp-rank-0-of-1_tp-rank-0-of-1.safetensors
+|   |   |-- checkpoint_metadata.json
+|   |   `-- model_config.json
+|   `-- README.md
+|-- scripts/
+|   |-- build_smoltalk_jsonl.py
+|   |-- export_nanotron_ckpt_to_hf.py
+|   |-- make_finewebedu_int45_subset.py
+|   |-- prep_smol_smoltalk_for_nanotron.py
+|   |-- prepare_dataset.py
+|   |-- prepare_dataset_cosmo.py
+|   |-- prepare_dataset_FINEWEB.py
+|   |-- prepare_dataset_pile.py
+|   |-- prepare_dataset_stage2.py
+|   |-- prepare_env.sh
+|   |-- prepare_sft_data_smoke.py
+|   |-- print_sft_schema.py
+|   |-- README.md
+|   |-- run_lighteval_stage1_backend.py
+|   |-- run_lighteval_stage1_real.sh
+|   |-- run_lighteval_stage2_backend.py
+|   |-- run_lighteval_stage2_real.sh
+|   |-- run_lighteval_stage3_backend.py
+|   |-- run_lighteval_stage3_real.sh
+|   |-- run_lighteval_stage4_backend.py
+|   |-- run_lighteval_stage4_real.sh
+|   |-- run_train.py
+|   |-- sft_check.py
+|   |-- stage1_eval_offline.sh
+|   |-- stage1_prefill_cache.sh
+|   |-- stage2_eval_offline.sh
+|   |-- stage2_prefill_cache.sh
+|   |-- stage3_eval_offline.sh
+|   |-- stage3_prefill_cache.sh
+|   |-- stage4_eval_offline.sh
+|   |-- stage4_prefill_cache.sh
+|   |-- submit_eval_stage1.sh
+|   |-- submit_eval_stage2.sh
+|   |-- submit_eval_stage3.sh
+|   |-- submit_eval_stage4.sh
+|   |-- vibe_test_sft.py
+|   |-- vibe_test_sft_batch.py
+|   |-- vibe_test_sft_chat.py
+|   `-- vibetest_sft.py
+|-- slurm/
+|   |-- logs_pile/
+|   |-- eval_stage1_manual.sbatch
+|   |-- eval_stage2_manual.sbatch
+|   |-- eval_stage3_manual.sbatch
+|   |-- eval_stage4_manual.sbatch
+|   |-- install_grouped_gemm_nanotron_env.sbatch
+|   |-- README.md
+|   |-- run_data_prep.sbatch
+|   |-- run_data_prep_cosmo.sbatch
+|   |-- run_data_prep_FINEWEB.sbatch
+|   |-- run_data_prep_pile.sbatch
+|   |-- run_data_prep_SLIM.sbatch
+|   |-- run_data_prep_stage2.sbatch
+|   |-- run_data_prep_stage2.sbatch.save
+|   |-- run_sft_smoke_hf.sbatch
+|   |-- run_smoke_checknigg.sbatch
+|   |-- run_stage1.sbatch
+|   |-- run_stage1_dokimi.sbatch
+|   |-- run_stage2.sbatch
+|   |-- run_stage3.sbatch
+|   |-- sft_stage3_smoltalk.sbatch
+|   |-- sft_stage3_smoltalk_dbg.sbatch
+|   |-- sft_stage3_smoltalk_preproc.sbatch
+|   |-- sft_stage3_smoltalk_train.sbatch
+|   |-- vibe_test.sbatch
+|   |-- vibe_test_sft.sbatch
+|   |-- vibe_test_sft_5000.sbatch
+|   `-- vibe_test_sft_chat.sbatch
+|-- .gitignore
+|-- LICENSE
+`-- README.md
+
+Total directories: 783, Total files: 677

@@ -1,0 +1,75 @@
+{
+  "slices": {
+    "books_newslike": {
+      "nll": 3.8570343295740246,
+      "ppl": 47.324793307502915,
+      "tokens": 4994286
+    },
+    "code": {
+      "nll": 2.082456780436808,
+      "ppl": 8.02415831329378,
+      "tokens": 4994286
+    },
+    "code_opencodereasoning": {
+      "nll": 2.207645968467061,
+      "ppl": 9.094282946607864,
+      "tokens": 4994286
+    },
+    "code_stackv2_edu_filtered": {
+      "nll": 1.8927571252157434,
+      "ppl": 6.637644291842366,
+      "tokens": 4994286
+    },
+    "code_starcoder2data_extras_lhq": {
+      "nll": 1.9921926324278385,
+      "ppl": 7.331591636938702,
+      "tokens": 4994286
+    },
+    "general_web": {
+      "nll": 3.682803835689246,
+      "ppl": 39.757712032931124,
+      "tokens": 4994286
+    },
+    "math_finemath3plus": {
+      "nll": 2.2840067125903865,
+      "ppl": 9.81593133910445,
+      "tokens": 4994286
+    },
+    "math_finemath4plus": {
+      "nll": 2.387351980980583,
+      "ppl": 10.88463303249693,
+      "tokens": 4994286
+    },
+    "math_infiwebmath3plus": {
+      "nll": 2.583576457855725,
+      "ppl": 13.244421671445675,
+      "tokens": 4994286
+    },
+    "math_infiwebmath4plus": {
+      "nll": 2.401756387013532,
+      "ppl": 11.042554357115963,
+      "tokens": 4994286
+    },
+    "math_openmathinstruct1": {
+      "nll": 2.048621270638085,
+      "ppl": 7.757198652560021,
+      "tokens": 4994286
+    },
+    "math_openmathreasoning": {
+      "nll": 1.905921396737817,
+      "ppl": 6.72560172107364,
+      "tokens": 4994286
+    },
+    "web_fineweb_edu_sample10bt": {
+      "nll": 3.2606159226967706,
+      "ppl": 26.0655865857856,
+      "tokens": 4994286
+    },
+    "wiki_en_20231101": {
+      "nll": 3.346187871742014,
+      "ppl": 28.394284409943335,
+      "tokens": 4994286
+    }
+  },
+  "ppl_macro_avg": 16.57859959276017
+}

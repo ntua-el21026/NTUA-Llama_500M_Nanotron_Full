@@ -1,0 +1,19 @@
+dataset
+  dataset_folder:
+    - "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_COSMO/part_0"
+    - "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_FINEWEB/part_0"
+    - "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_FINEWEB/part_1"
+    - "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_STARCODER/part_0"
+    - "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_SLIMPYJAMA/part_0"
+    - "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_OPENMATH/part_0"
+    - "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_STACKEX/part_0"
+    - "/leonardo_scratch/large/userexternal/mpeppas0/STAGE_3_RUN/STAGE_3_STACKEX/part_1"
+  dataset_weights:
+    - 0.03125
+    - 0.17187
+    - 0.17187
+    - 0.15625
+    - 0.01562
+    - 0.17187
+    - 0.14063
+    - 0.14064

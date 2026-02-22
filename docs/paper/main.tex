@@ -1,0 +1,692 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote.
+% If that is unneeded, please comment it out.
+
+\usepackage{cite}
+\usepackage{placeins}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage[dvipsnames]{xcolor}
+\definecolor{darkcyan}{rgb}{0.0,0.55,0.55}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=darkcyan,
+    filecolor=MidnightBlue,
+    urlcolor=darkcyan,
+    pdftitle=Specia Topic Report,
+    pdfpagemode=FullScreen,
+}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{subcaption}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+% Enables manual line break between rows in IEEE author grid
+\makeatletter
+\newcommand{\linebreakand}{%
+    \end{@IEEEauthorhalign}
+    \hfill\mbox{}\par
+    \mbox{}\hfill\begin{@IEEEauthorhalign}
+}
+\makeatother
+
+\begin{document}
+
+\title{Training a Subbillion LLM based on The Smol Training Playbook}
+
+\author{
+    % --- ROW 1: Two Authors ---
+    \IEEEauthorblockN{Evaggelos Asitzoglou}
+    \IEEEauthorblockA{\footnotesize
+    \mbox{\textit{School of Electrical and Computer Engineering}}\\
+    \mbox{\textit{National Technical University of Athens}}\\
+    Athens, Greece\\
+    vaggelisima@yahoo.com}
+    \and
+    \IEEEauthorblockN{Panagiotis Avgerinos}
+    \IEEEauthorblockA{\footnotesize
+    \mbox{\textit{School of Electrical and Computer Engineering}}\\
+    \mbox{\textit{National Technical University of Athens}}\\
+    Athens, Greece\\
+    panikavger@gmail.com}
+    
+    \linebreakand
+
+    % --- ROW 2: Three Authors ---
+    \IEEEauthorblockN{Michail-Athanasios Peppas}
+    \IEEEauthorblockA{\footnotesize
+    \mbox{\textit{School of Electrical and Computer Engineering}}\\
+    \mbox{\textit{National Technical University of Athens}}\\
+    Athens, Greece\\
+    peppas.michael@gmail.com}
+    \and
+    \IEEEauthorblockN{Andreas Saounatsos}
+    \IEEEauthorblockA{\footnotesize
+    \mbox{\textit{School of Electrical and Computer Engineering}}\\
+    \mbox{\textit{National Technical University of Athens}}\\
+    Athens, Greece\\
+    asaounat@gmail.com}
+    \and
+    \IEEEauthorblockN{Giannis Chatzigeorgiadis}
+    \IEEEauthorblockA{\footnotesize
+    \mbox{\textit{School of Electrical and Computer Engineering}}\\
+    \mbox{\textit{National Technical University of Athens}}\\
+    Athens, Greece\\
+    yiannishatzigeorgiadis@gmail.com}
+}
+
+\maketitle
+
+\begin{abstract}
+
+In this report, we detail the end-to-end development of our own 0.5B-parameter LLM, which we pretrained from scratch on 22 billion tokens. Although efficient small-scale models have become increasingly accessible, optimizing their training curriculum remains a challenge. Building upon the foundational methodologies of the Hugging Face SmolLM playbook, we introduce a custom three-stage pretraining pipeline. Specifically, we diverge from the baseline by modifying the depth-to-width ratio to favor a deeper, narrower architecture. Additionally, we allocate a larger fraction of our parameter budget to the embedding layer, drawing inspiration from recent advancements in small-scale model design. Following the pretraining phase, the model underwent Supervised Fine-Tuning (SFT) to align its output for instruction-following tasks. Our training loss curve and downstream benchmarks demonstrate that our custom pretraining curriculum and subsequent SFT pipeline produce strong performance on logical reasoning benchmarks, outperforming many older models trained on larger data volumes.
+Our training configurations, and final model weights are publicly available at \url{https://github.com/ntua-el21026/NTUA-LLama_500M_Nanotron.git}.
+
+\end{abstract}
+
+\section{Introduction}
+
+In recent years, large language models (LLMs) have demonstrated remarkable capabilities across a wide range of natural language processing and, more generally, pattern recognition tasks, enabled by their scalability in both parameters and training data. Modern models may contain hundreds of billions of parameters, allowing them to effectively capture highly complex statistical patterns. However, this scale comes at a cost: training such models requires tremendous computational resources and specialized hardware, resulting in significantly increased financial investment.
+
+These limitations have motivated the adoption of smaller, more efficient language models designed for targeted use rather than universal generality, and trained on curated datasets to solve specific tasks not only more efficiently but also with lower infrastructure demands. Because they require fewer parameters and reduced compute, such models are faster to train, cheaper to deploy, and accessible to organizations without access to excessive resources. Furthermore, their compact memory footprint unlocks the potential for on-device, offline inference. This edge-deployment capability offers distinct advantages over massive cloud-based architectures, including guaranteed data privacy, zero network latency, and reliable functionality in environments with limited internet connectivity.
+
+The Smol Training Playbook \cite{Smol_Playbook} emerges within this context as a practical methodology for building high-quality language models under realistic resource constraints. Rather than treating model development as a purely scaling-driven process, it frames training as a sequence of deliberate engineering decisions, including architectural selection, data curation, controlled ablations, evaluation design, supervised fine-tuning, and infrastructure optimization.
+
+Inspired by this methodology, we followed a similar engineering process to build a 500M-parameter LLaMA-style model using the Nanotron \cite{nanotron} framework. The model was pretrained on a curated mixture of high-quality datasets, totaling approximately 22 billion tokens, enabling efficient experimentation under constrained compute while maintaining large-scale training characteristics. Crucially, we recognize that at the sub-billion parameter scale, attempting to achieve universal competence often results in diluted, uniformly mediocre performance. Therefore, rather than spreading our limited parameter budget thinly to maximize broad factual recall, we deliberately adopted a deep and narrow architectural topology to optimize for targeted proficiency in logical reasoning
+
+\section{Approach}
+
+Our core methodology is grounded in the standard decoder-only Transformer architecture \cite{original_transformer}, incorporating key structural optimizations and the tokenizer vocabulary introduced by the LLaMA 3 model family \cite{Llama}. Because our training pipeline was heavily constrained by the available compute budget—specifically restricted to a single compute node on the Leonardo supercomputer with a strict wall-clock time limit—our approach necessitated highly deliberate engineering. Consequently, every architectural scaling decision and infrastructural configuration was rigorously optimized to maximize training throughput and resource efficiency.
+
+\subsection{Architecture}
+\label{subsec:architecture}
+
+\begin{table}[htbp]
+\caption{Architectural Comparison: GPT-2 (Medium) vs. Our Model}
+\label{tab:architecture_comparison}
+\centering
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Hyperparameter} & \textbf{GPT-2 (Medium) \cite{gpt2}} & \textbf{Our Model} \\ \midrule
+Estimated Parameters & $\sim$345M & $\sim$492M \\
+Hidden Layers (Depth) & 24 & 32 \\
+Hidden Dimension (Width) & 1024 & 1024 \\
+Attention Architecture & MHA (16 Q, 16 KV) & GQA (16 Q, 4 KV) \\
+Vocabulary Size & 50,257 & 128,256 \\
+Context Window & 1024 & 1024 \\
+Positional Embeddings & Learned Absolute & RoPE \\
+Activation Function & GELU & SwiGLU (SiLU) \\
+Normalization & LayerNorm & RMSNorm \\ \bottomrule
+\end{tabular}
+\end{table}
+
+The primary objective of this phase was to design a language model with approximately 500 million parameters capable of outperforming legacy architectures of similar scale, such as GPT-2 \cite{gpt2}. A detailed comparison of our architectural hyperparameters against the GPT-2 Medium baseline is provided in Table \ref{tab:architecture_comparison}. Drawing upon recent empirical studies on sub-billion parameter models, specifically MobileLLM \cite{subbilion_Lm}, we adopted a "deep and narrow" topological strategy. We operated under the premise that while expanding the hidden dimension (width) primarily increases a model's capacity for broad factual memorization, increasing the number of transformer layers (depth) significantly enhances its ability to generalize and execute complex sequential logic. By sacrificing some encyclopedic knowledge capacity in favor of architectural depth, we engineered a model highly optimized for reasoning and mathematical problem-solving.
+
+The exact parameter count of our model is approximately 492M. To maximize the efficiency of this strict parameter budget, we integrated several modern architectural mechanisms from the LLaMA family \cite{Llama}:
+
+\begin{itemize}
+    \item \textbf{Deep and Narrow Topology:} The network is configured with 32 hidden layers and a relatively constrained hidden dimension of 1024. This high depth-to-width ratio forces the model to learn more abstracted, generalizable representations early in the training process, a crucial quality for small-scale models competing against larger counterparts.
+    \item \textbf{Expanded Vocabulary and Tied Embeddings:} We adopted the LLaMA-3 tokenizer, which features a massive vocabulary size of 128,256 tokens. While this drastically improves the tokenization efficiency for mathematical equations, code, and multilingual text, it introduces a significant "embedding tax" (consuming roughly 131M parameters). To mitigate this, we utilized weight tying between the input embedding and the final output unembedding layers, a technique proven to regularize the model and save parameters without degrading performance \cite{tied_embeddings}.
+    \item \textbf{Grouped-Query Attention (GQA):} To optimize both training memory footprint and future inference speed, we implemented GQA \cite{gqa}. The model utilizes 16 attention heads for queries and 4 heads for key-value pairs, substantially reducing the memory bandwidth required for the KV cache while maintaining performance comparable to standard Multi-Head Attention.
+    \item \textbf{Modern Activation and Normalization:} We replaced standard Feed-Forward Networks with SwiGLU activations (using an intermediate size of 2816 and the SiLU function) to improve gradient flow and model capacity \cite{swiglu}. Furthermore, we employed Root Mean Square Normalization (RMSNorm) \cite{rmsnorm} to enhance training stability while reducing computational overhead compared to LayerNorm.
+    \item \textbf{Rotary Positional Embeddings (RoPE):} To allow for better length extrapolation and robust relative context utilization, we applied RoPE \cite{rope} with a base theta of $10000.0$, supporting a maximum context window of 1024 tokens.
+\end{itemize}
+
+\subsection{Infrastructure and Training Setup}
+\label{subsec:infrastructure}
+
+All pretraining and fine-tuning stages were executed on a single compute node within the Leonardo supercomputer, equipped with four NVIDIA A100 GPUs (60GB VRAM capacity each) and 32 CPU cores. To orchestrate the distributed training, we utilized the Nanotron framework \cite{nanotron}, which provides optimized primitives for 3D parallelism. 
+
+Due to our deep 32-layer architecture and the significant memory overhead of the expanded vocabulary, memory management required rigorous optimization. Initial empirical tests using a micro-batch size of 32 resulted in immediate Out-Of-Memory (OOM) errors. Furthermore, due to framework-specific compatibility constraints between ZeRO redundancy optimizers \cite{zero_paper} and our requirement for FP32 gradient accumulation, we opted to disable ZeRO entirely (ZeRO Stage 0). Instead, we relied on pure Data Parallelism (DP=4) combined with activation checkpointing \cite{activation_checkpointing} to fit the model within the 60GB VRAM limit. 
+
+To maintain a mathematically optimal global batch size without exceeding memory constraints, we reduced the micro-batch size to 4 sequences per GPU and applied 16 gradient accumulation steps. Across the 4 replica workers, this yielded an effective global batch size of 256 sequences. Data loading was parallelized using 8 dedicated CPU workers to prevent I/O bottlenecks, allowing us to maintain a stable hardware throughput of approximately 100,000 tokens per second across all training stages.
+
+The network was optimized using a fused AdamW optimizer \cite{adamw} with gradients accumulated in FP32 precision. Because our deep "narrow and long" topological design significantly increased the risk of exploding gradients—a common instability when training Transformers with high layer counts—gradient clipping was a major architectural concern. To mitigate this, gradients were strictly clipped at a maximum norm of 1.0 throughout all phases.  While specific hyperparameters such as peak learning rate and warmup steps were dynamically adjusted per training stage (detailed in subsequent sections), our general strategy relied on a cosine decay schedule. Crucially, to support our continuous multi-stage curriculum, the learning rate was never allowed to decay to zero; a minimum threshold was always enforced to preserve model plasticity for learning new data distributions.
+
+\section{Phase 1: Pre-training}
+
+\subsection{Pre-training Data}
+\label{subsec:pretraining_data}
+
+Selecting appropriate data sources is crucial for a small-scale, general-purpose LLM. We train on English-only text using a three-part corpus spanning web/language data, math reasoning data, and code data. In this setting, the dataset mixture often affects downstream performance more than minor architecture or optimizer tweaks: with limited capacity, noisy sources can waste the token budget and degrade representations, instruction following, and reasoning. Because corpus composition directly shapes the model’s skills (e.g., exposure to step-by-step explanations, code patterns, and Q\&A interactions), we emphasize high-signal text and a stage-wise curriculum that builds language competence first and then gradually introduces math and code while mitigating catastrophic forgetting.
+
+
+\textbf{Web / language data.}
+For the language backbone, we used a mixture of \textit{Cosmopedia}, \textit{SlimPajama}, \textit{FineWeb-Edu}, and \textit{Stack Exchange}. Aggregated across stages, the overall web-mixture proportions were: 52\% \textit{Cosmopedia}, 25\% \textit{SlimPajama}, 17\% \textit{FineWeb-Edu}, and 6\% \textit{Stack Exchange} (note that each stage uses different internal ratios; these percentages refer to the total web mixture over the full run).
+
+\textit{Cosmopedia} is a large synthetic corpus (e.g., textbooks, blog posts, stories, WikiHow-style articles) generated by Mixtral-8x7B-Instruct-v0.1, reported to contain $>$30M files and $\sim$25B tokens \cite{cosmopedia_dataset,cosmopedia_blog}.
+\textit{SlimPajama} is a cleaned and deduplicated multi-source web dataset derived from RedPajama, used to inject broad and diverse web coverage \cite{slimpajama}.
+\textit{FineWeb-Edu} is a high-quality educational subset of FineWeb, accompanied by quality fields such as \texttt{score} (0--5) and \texttt{int\_score}; in our pipeline we retained only the top-quality portion with \texttt{int\_score} $\in \{4,5\}$ to emphasize explanatory writing \cite{finewebedu,fineweb_paper}.
+Finally, \textit{Stack Exchange} provides large-scale Q\&A-style discourse from multiple communities and is distributed through periodic public data dumps, which we use to strengthen instruction-like interactions \cite{stackexchange_dump,stackexchange_process}.
+
+\textbf{Math data.}
+For mathematical reasoning, we used \textit{OpenMathReasoning} exclusively. This dataset is designed for math reasoning training and contains hundreds of thousands of math problems (e.g., $\sim$306K unique problems as reported on its dataset card) \cite{openmath,openmath_paper}.
+Given the relatively small fraction of math tokens in our overall budget, we expect the model to handle \emph{basic} math reliably, but not consistently solve complex problems.
+
+\textbf{Code data.}
+For code, we used the \textit{StarCoder} training dataset (\textit{bigcode/starcoderdata}) and restricted programming content to \textit{Python} only. The StarCoder dataset contains permissively licensed code across many languages and is described at large scale in the dataset card and accompanying paper \cite{starcoderdata,starcoder_paper}.
+As with math, the code subset we used is relatively small, but proved sufficient for simple programming tasks.
+
+\begin{table}[H]
+\caption{Aggregated web/language mixture (over all stages).}
+\label{tab:web_mixture}
+\centering
+\begin{tabular}{lc}
+\toprule
+\textbf{Dataset} & \textbf{Share} \\
+\midrule
+Cosmopedia & 52\% \\
+SlimPajama & 25\% \\
+FineWeb-Edu & 17\% \\
+Stack Exchange & 6\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Training stages}
+\label{subsec:training_stages}
+
+\textbf{Overview.}
+We adopt a three-stage pre-training curriculum that progressively shifts the data distribution from broad web text to a more instruction- and reasoning-oriented mixture. Across the full pre-training run, the aggregated token split between web/math/code is 84/8/8, while each stage uses a distinct modality ratio (Table~\ref{tab:stage_modality}). This design aims to (i) build a strong linguistic foundation, (ii) introduce math and code in a controlled manner, and (iii) prepare the model for SFT by emphasizing instruction-like interactions.
+
+Table~\ref{tab:stage_lr} summarizes the modality ratios and learning-rate schedules used in each stage.
+
+\textbf{Stage 1: Web-only foundation (language competence).}
+Stage~1 uses only web/language datasets (no math/code), accounting for more than half of the total training tokens. The objective is to learn robust token-level statistics, grammar, and general world knowledge from high-signal explanatory text, while maintaining breadth via diverse web sources. In practice, Stage~1 stabilizes optimization and reduces the risk of the model overfitting early to narrow domains (e.g., code) before it has acquired general language competence. We train Stage~1 with a peak learning rate of $\eta_{\max}=3\times 10^{-4}$, warmup of 100 steps, and a minimum learning rate $\eta_{\min}=5\times 10^{-5}$ under a decayed schedule.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth,trim=10 10 10 10,clip]{STAGE_1_LOSS.png}
+\caption{LM training loss (\texttt{lm\_loss}) during Stage~1 (web-only foundation).}
+\label{fig:lm_loss_stage1}
+\end{figure}
+
+\textbf{Stage 2: Controlled introduction of reasoning modalities (math \& code).}
+Stage~2 introduces both math and code at equal weight (25\% math, 25\% code), while retaining 50\% web text. This stage targets reasoning and syntax-heavy patterns without sacrificing generalization. Keeping half of the tokens as web text acts as an ``anchor'' distribution, preventing the model from drifting too far toward domain-specific features and helping maintain fluency as new modalities are learned. Stage~2 uses $\eta_{\max}=1.5\times 10^{-4}$ with 900 warmup steps and $\eta_{\min}=1.5\times 10^{-5}$.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth,trim=10 10 10 10,clip]{STAGE_2_LOSS.png}
+\caption{LM training loss (\texttt{lm\_loss}) during Stage~2 (mixed modality training).}
+\label{fig:lm_loss_stage2}
+\end{figure}
+
+\textbf{Stage 3: SFT-oriented warmup (instruction-like discourse).}
+Stage~3 shifts the mixture toward SFT readiness by increasing exposure to \textit{Stack Exchange} within the web portion and using a lighter but non-trivial amount of math and code (16\% each, 68\% web). The goal is to nudge the model toward question-answer formats, concise explanations, and helpful conversational structure, while still preserving broad linguistic coverage. This stage serves as a bridge between pure pre-training and instruction tuning. Stage~3 uses a lower peak learning rate $\eta_{\max}=5\times 10^{-5}$ with 1000 warmup steps and $\eta_{\min}=5\times 10^{-6}$.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth,trim=10 10 10 10,clip]{STAGE_3_LOSS.png}
+\caption{LM training loss (\texttt{lm\_loss}) during Stage~3 (SFT-oriented warmup).}
+\label{fig:lm_loss_stage3}
+\end{figure}
+
+
+\begin{table}[H]
+\caption{Stage-wise modality composition.}
+\label{tab:stage_modality}
+\centering
+\begin{tabular}{lccc}
+\toprule
+\textbf{Stage} & \textbf{Web} & \textbf{Math} & \textbf{Code} \\
+\midrule
+Stage 1 (foundation) & 100\% & 0\% & 0\% \\
+Stage 2 (mixed)      & 50\%  & 25\% & 25\% \\
+Stage 3 (SFT warmup) & 68\%  & 16\% & 16\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[H]
+\caption{Learning-rate schedule per stage.}
+\label{tab:stage_lr}
+\centering
+\begin{tabular}{lccc}
+\toprule
+\textbf{Stage} & $\boldsymbol{\eta_{\max}}$ & \textbf{Warmup steps} & $\boldsymbol{\eta_{\min}}$ \\
+\midrule
+Stage 1 & $3.0\times 10^{-4}$ & 100  & $5.0\times 10^{-5}$ \\
+Stage 2 & $1.5\times 10^{-4}$ & 900  & $1.5\times 10^{-5}$ \\
+Stage 3 & $5.0\times 10^{-5}$ & 1000 & $5.0\times 10^{-6}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\caption{Qualitative objective of each stage.}
+\label{tab:stage_objectives}
+\centering
+\begin{tabular}{lp{0.67\linewidth}}
+\toprule
+\textbf{Stage} & \textbf{Primary objective} \\
+\midrule
+Stage 1 & Build broad language competence and stabilize optimization on web text. \\
+Stage 2 & Introduce math/code patterns while preserving fluency via a web ``anchor'' distribution. \\
+Stage 3 & Increase instruction-like discourse exposure to bridge pre-training and instruction tuning. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+
+\textbf{Optimization stability (gradient norm).}
+Across stages, we observed the gradient norm gradually decreasing and eventually stabilizing around a steady value. Aside from a small number of transient spikes, training remained stable; these spikes were effectively suppressed by gradient clipping, preventing destabilizing parameter updates.
+
+
+\textbf{Mitigating forgetting across stages.}
+To reduce catastrophic forgetting, we continue sampling from earlier sources as the curriculum progresses. Specifically, Stage~2 includes 16\% of the Stage~1 mixture, and Stage~3 retains 0.8\% from Stage~1 datasets. This lightweight replay preserves earlier linguistic breadth while leaving sufficient capacity for learning the newer stage distributions.
+
+\textbf{Dataset emphasis and rationale.}
+Within the web portion, we prioritize \textit{Cosmopedia} for clarity and an explanatory style \cite{cosmopedia_dataset,cosmopedia_blog}, while \textit{SlimPajama} provides broad and more natural web coverage \cite{slimpajama}. \textit{FineWeb-Edu} is filtered to high-quality slices (highest \texttt{int\_score} levels) and is emphasized in later stages to strengthen educational, step-by-step exposition \cite{finewebedu,fineweb_paper}. Finally, \textit{Stack Exchange} is increased toward the end of training to better align the model with instruction-like Q\&A interactions prior to SFT \cite{stackexchange_dump,stackexchange_process}. The aggregated web mixture over all stages is summarized in Table~\ref{tab:web_mixture}.
+
+\subsection{Evaluation}
+\label{subsec:pretraining_evaluation}
+
+\textbf{Architecture and objective.}
+We evaluate pre-training with a three-tier protocol.
+Tier 1 tracks training health (loss stability, gradient behavior, throughput, NaN/Inf checks).
+Tier 2 measures token-level modeling quality on targeted web/code/math slices, based on perplexity (PPL). Tier 3 measures accuracy in downstream reasoning and QA behavior with conditional-likelihood MCQ scoring. This design follows the SmolLM-style development and keeps evaluation reproducible with offline cached inputs \cite{Smol_Playbook,smollm3_hf,smollm_corpus}.
+
+\textbf{Dataset decision.}
+Web slices (C4, FineWeb-Edu, Wikipedia, WikiText) test broad linguistic robustness and explanatory style. Code slices (CodeParrot, Stack-v2-Edu, StarCoder2-extras, OpenCodeReasoning) test syntax consistency and code-solution structure.
+Math slices (FineMath 3+/4+, InfiWebMath 3+/4+, OpenMathReasoning, OpenMathInstruct-1) test symbolic and multi-step mathematical text. We expect PPL of all slices to drop, with the model excelling at code and math. Tier-3 tasks cover commonsense, science QA, physical reasoning, and broad knowledge \cite{eval_c4,eval_codeparrot,eval_wikitext,eval_finemath,finewebedu,eval_wikipedia,eval_stackv2edu,eval_starcoder2extras,openmath,eval_openmathinstruct1,eval_opencodereasoning,eval_arc,eval_openbookqa,eval_qasc,eval_sciq,eval_commonsenseqa,eval_hellaswag,eval_socialiqa,eval_superglue,eval_piqa,eval_winogrande,eval_mmlu}.
+
+\begin{figure*}[t]
+\centering
+\begin{subfigure}{0.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{pretrain_tier2_per_slice_vs_tokens}
+    \caption{Tier-2 domain trends (web/code/math) with overlaid macro PPL (dashed black), vs cumulative tokens.}
+    \label{fig:pretrain_t2_domain_tokens}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{pretrain_tier3_semantic_categories_vs_tokens}
+    \caption{Tier-3 semantic-category trends with overlaid macro CF (dashed black), vs cumulative tokens.}
+    \label{fig:pretrain_t3_semantic_tokens}
+\end{subfigure}
+\caption{Pre-training evaluation trends with macro context embedded in each detailed plot.}
+\label{fig:pretrain_detailed_trends}
+\end{figure*}
+
+\textbf{The results.}
+Modeling quality (PPL) improves consistently with tokens, and the strongest gains are concentrated in the intended specialization domains (code and math).
+Reasoning/QA macro behavior is flatter and non-monotonic, indicating that token-level modeling gains do not uniformly transfer to all QA categories.
+The combined plots make this trade-off explicit: by the end of pre-training, code/math remain comparatively strong, while broad web-style modeling and broad-knowledge/harder science QA remain the main bottlenecks.
+
+The aggregate trend confirms strong specialization in token-level modeling quality across stages.
+The reasoning/QA aggregate remains stable from Stage 1 to Stage 2, then decreases at Stage 3 end.
+This indicates that distribution-quality gains are robust, while downstream reasoning gains are bounded and task-sensitive.
+
+\begin{table}[H]
+\caption{Tier-2 slice values at final checkpoint of each stage. ``--'' means not in that stage suite.}
+\label{tab:pretrain_slices_all_finals}
+\centering
+\scriptsize
+\setlength{\tabcolsep}{4pt} % Reduces white space between columns
+\resizebox{\columnwidth}{!}{% Forces table to be exactly 1 column wide
+\begin{tabular}{lccc}
+\toprule
+\textbf{Slice} & \textbf{Stage 1 final} & \textbf{Stage 2 final} & \textbf{Stage 3 final} \\
+\midrule
+\texttt{general\_web} & 32.07 & 34.19 & 34.30 \\
+\texttt{web\_fineweb\_edu\_sample10bt} & 26.49 & 22.73 & 22.46 \\
+\texttt{wiki\_en\_20231101} & 20.24 & 24.10 & 24.25 \\
+\texttt{books\_newslike} & 46.00 & 42.19 & 42.46 \\
+\texttt{code} & 12.84 & 6.76 & 6.40 \\
+\texttt{code\_stackv2\_edu\_filtered} & -- & 6.05 & 5.45 \\
+\texttt{code\_starcoder2data\_extras\_lhq} & -- & 10.61 & 10.34 \\
+\texttt{code\_opencodereasoning} & -- & -- & 8.72 \\
+\texttt{math\_finemath3plus} & 12.81 & 8.60 & 8.44 \\
+\texttt{math\_finemath4plus} & -- & 9.38 & 9.17 \\
+\texttt{math\_infiwebmath3plus} & 18.52 & 11.42 & 11.20 \\
+\texttt{math\_infiwebmath4plus} & -- & 9.53 & 9.38 \\
+\texttt{math\_openmathreasoning} & -- & -- & 6.44 \\
+\texttt{math\_openmathinstruct1} & -- & -- & 7.01 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+Slice-level results match the intended objective of prioritizing reasoning/code/math capability.
+Code and math slices show the strongest improvements and reach low final error values, especially on high-quality and reasoning-oriented subsets.
+Broad web-style slices remain comparatively harder, consistent with the deliberate capacity trade-off toward specialized competence rather than broad factual coverage.
+
+\begin{table*}[t] % The asterisk (*) makes it a double-column table
+\caption{Tier-3 reasoning/QA task values at final checkpoint of each stage, compared against external baselines. ``--'' means not evaluated.}
+\label{tab:pretrain_tasks_all_finals}
+\centering
+\scriptsize
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Task} & \textbf{Stage 1} & \textbf{Stage 2} & \textbf{Stage 3} & \textbf{GPT-2 (345M \cite{gpt2}} & \textbf{Pythia-160M \cite{pythia}} & \textbf{Pythia-410M} \cite{pythia}\\
+\midrule
+\texttt{arc\_easy} & 0.28 & 0.27 & 0.28 & -- & 0.43 & 0.52 \\
+\texttt{arc\_challenge} & -- & -- & \textbf{0.25} & -- & 0.22 & 0.24 \\
+\texttt{openbookqa} & 0.28 & 0.31 & \textbf{0.31} & 0.18 & 0.26 & 0.29 \\
+\texttt{qasc} & 0.13 & 0.15 & 0.14 & -- & 0.17 & 0.22 \\
+\texttt{sciq} & 0.54 & 0.59 & 0.60 & 0.74 & 0.74 & 0.79 \\
+\texttt{commonsense\_qa} & 0.23 & 0.23 & 0.24 & -- & 0.21 & 0.23 \\
+\texttt{hellaswag} & 0.32 & 0.32 & 0.32 & 0.29 & 0.30 & 0.40 \\
+\texttt{copa} & 0.64 & 0.60 & 0.60 & -- & 0.53 & 0.58 \\
+\texttt{piqa} & 0.67 & 0.65 & 0.66 & 0.63 & 0.59 & 0.67 \\
+\texttt{winogrande} & 0.51 & 0.51 & 0.51 & 0.50 & 0.50 & 0.54 \\
+\texttt{mmlu} & -- & -- & 0.24 & -- & 0.26 & 0.29 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+Task-level behavior remains heterogeneous. While several tasks demonstrate strong and stable performance (e.g., PIQA, SciQ, COPA), the newly introduced harder evaluation components expose persistent weaknesses in broad-knowledge and hard science-style reasoning.
+
+Despite these domain-specific bottlenecks, contextualizing the results against external baselines reveals the remarkable token efficiency of our training curriculum. As shown in Table \ref{tab:pretrain_tasks_all_finals}, our $\sim$492M parameter model—trained on merely 22 billion tokens—matches or outperforms legacy models exposed to vastly larger corpora. For instance, it achieves an ARC-Challenge accuracy of 0.25 and an OpenBookQA score of 0.31, outperforming both GPT-2 Medium \cite{gpt2} ($\sim$10B tokens, lacking reasoning focus) and Pythia-410M \cite{pythia} (300B tokens). Ultimately, the pre-training curriculum achieves its primary goal: validating that a deep-and-narrow architecture combined with a curated, math-and-code-heavy mixture can yield highly competitive logical reasoning capabilities.
+
+\section{Phase 2: Supervised Fine-Tuning (SFT)}Supervised Fine-Tuning was performed on the pretrained model from stage 3,  to align it with instruction-following and assistant-style dialogue behavior \cite{instructgpt}. The SFT framework of nanotron was used, using the same run scrips for the case that the dataset is of sft type and sftdataloading is enabled. The training objective is next-token cross-entropy but applied to chat/instruction-formatted data. Additionaly, with prompt masking, so the loss is driven by the assistant response tokens rather than the user/system prompt. Primarly, this prevents the model from learning to reproduce the prompt formatting instead of learning to answer.   
+
+\subsection{SFT Data}The dataset used for SFT training is smol-smoltalk, an explicitly curated subset of SmolTalk dataset adapted especially for “smol” models (less than 1B parameters)\cite{smol_smoltalk_dataset}. It is also the dataset used in the SmolLM2 training recipes, making it a well-documented default for models in the sub-billion range, whereas many alternative open instruction datasets are either noisier, less consistently formatted, or not designed with small model alignment in mind\cite{smollm2_paper}. 
+
+
+\subsection{SFT Training} For the main SFT training the same tokenizer family as pretraining Llama-3 was used, to keep the token-ID mapping consistent with the model’s learned embeddings. Changing tokenizer post-pretraining typically requires resizing/reinitializing embeddings and can degrade quality. Moreover, the standardized way to serialize a list of chat messages into model-ready text is using a chat template. 
+
+The selected tokenizer did not include a usable chat template so prompts were not being formatted consistently for chat-style SFT and inference. A custom tokenizer directory was created that embeds a Llama-3-style Jinja chat\_template as documented in Llama 3 prompt format. The template renders messages with \textless{}\textbar{}begin\_of\_text\textbar{}\textgreater{}, role headers (system/user/assistant), and \textless{}\textbar{}eot\_id\textbar{}\textgreater{} end-of-turn markers\cite{llama3_prompt_format_docs}.
+
+The training done was split into tokens per training step as 16,384 tokens/step. Therefore for 5000 steps the the total number of SFT tokens used is 81.92M. At the relative scale, the tokens for SFT should be some small percentage of the pretrain tokens, for this case as having 22B total pretraining tokens, this percentage is 0.37.
+
+The weights were initialized from the Stage-3 pretrained checkpoint, but since at this stage an SFT warmup took place, the pretrained representation was preserved while the optimization dynamics were restarted for the new instruction/chat objective. Optimization used AdamW with \texttt{betas}=\texttt{(0.9,0.95)}, \texttt{eps}=\texttt{1e-8}, gradient clipping at \texttt{1.0}, and \texttt{accumulate\_grad\_in\_fp32: true}. The learning-rate (LR) schedule used a peak LR of \texttt{1e-5}, with a linear warmup of \texttt{200} steps, followed by cosine decay over \texttt{5000} steps.
+
+In sft a lower learning rate helps to avoid overwriting pretrained knowledge and reduces the risk of catastrophic forgetting, as in this part of training the already-trained network is updated on a narrower, behavior-focused dataset\cite{huang2025fapm}.
+
+\subsection{Evaluation}
+
+\label{subsec:sft_evaluation}
+
+\textbf{Architecture and objective.}
+SFT is evaluated with a bridge-plus-checkpoints protocol in \emph{token space}.
+The pre-SFT bridge is the end of pre-training at \textbf{23.13B cumulative pre-training tokens} 
+SFT evaluations are reported at \textbf{8.19M}, \textbf{24.58M}, \textbf{57.34M}, and \textbf{81.92M} SFT tokens.
+We keep the same modeling and reasoning suites for comparability and add an SFT-native prompt track for instruction behavior.
+
+\textbf{Methodology for the SFT-native prompt suite.}
+We use a fixed 50-prompt set grouped into eight categories:
+\texttt{format\_following}, \texttt{structured\_output}, \texttt{code\_generation}, \texttt{instruction\_priority}, \texttt{instruction\_following}, \texttt{reasoning\_short}, \texttt{safety\_behavior}, and \texttt{chat\_cleanliness}.
+For each response, we apply deterministic checks:
+instruction match, strict all-check pass, format validity, chat cleanliness, and type-specific checks.
+All prompts and checks are identical across token checkpoints.
+
+\textbf{Manual Vibe Tests.} Some vibe tests done manually as following:
+
+\noindent\textbf{Prompt:}
+Who is the current President of the United States?\\
+\textbf{Completion:}
+The current President of the United States, also known as the President of the Republic of the United States (U.S.) or simply "the President" in the modern sense.
+
+\medskip
+\noindent\textbf{Prompt:} You have a 4-hour study session. Create a plan with 6 time blocks. Include: (a) 2 short breaks, (b) one block for “active recall”, (c) one block for “practice problems”.Explain why the order is optimal in 3 sentences\\
+\textbf{Completion:}
+Plan your next steps on a daily basis. I am here to help you stay focused and make progress.\\
+To optimize learning, we must divide our sessions into two groups of three or four:\\
+1-30 minutes each day: 15 minute intervals that include 20 minutes for review during class time.\\
+Every day: 30-45-minute blocks.\\
+If possible, complete at least every other day - 60-90 minutes after classes where you can go over previous week's notes from previous days so far
+
+\medskip
+\noindent\textbf{Prompt:}
+for x complex number, calculate the roots of equation  10x\^{}2+3x+2 = 0\\
+\textbf{Compltetion:}To find the roots of the equation 10x\^{}2+3x+2 = 0, we can use the quadratic formula. The quadratic formula is x = (-b ± √(b\^{}2 - 4ac)  2a, where a = 10, b = 3, c = 2, and a = 2. The roots of the equation are x = 0, 1, 1, and 2.
+
+From the qualitative “vibe tests,” the model shows weak factual reliability and poor instruction adherence on knowledge-based queries. On structured planning tasks, the model partially captures the intent but fails to satisfy key constraints. For short, well-defined reasoning problems, the model attempts to apply standard solution procedures (e.g., invoking the quadratic formula), which indicates some retained “tool-use” patterns. 
+
+However, execution accuracy is inconsistent. Overall, the model appears more capable of initiating appropriate reasoning steps in small contexts than of producing correct, verifiable results or faithfully meeting multi-part constraints.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{sft_tier2_macro_ppl_vs_tokens}
+\caption{Modeling macro across SFT tokens.}
+\label{fig:sft_t2_macro_tokens}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{sft_tier3_macro_cf_vs_tokens}
+\caption{Reasoning/QA macro across SFT tokens.}
+\label{fig:sft_t3_macro_tokens}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{sft_prompt_category_pass_bridge_vs_final}
+\caption{SFT-native prompt behavior at strong categories.}
+\label{fig:sft_prompt_behavior}
+\end{figure}
+
+\FloatBarrier
+\textbf{The results.}
+SFT produces immediate gains in prompt-facing behavior, while modeling quality degrades at higher SFT token counts.
+Strict instruction-compliance improves early and stays above bridge, but this comes with progressively higher modeling error at later checkpoints.
+Reasoning/QA macro stays near bridge, without clear monotonic improvement.
+Category gains are concentrated in \texttt{code\_generation} and \texttt{reasoning\_short}, indicating targeted adaptation rather than broad uplift across prompt families.
+Overall, the pattern is alignment-dominant: stronger output control, but limited transfer to general downstream reasoning benchmarks.
+
+\begin{table}[H]
+\caption{Prompt-summary metrics: base pre-training (0.00M SFT tokens) vs final SFT (81.92M SFT tokens).}
+\label{tab:sft_prompt_summary}
+\centering
+\begin{tabular}{lccc}
+\toprule
+\textbf{Metric} & \textbf{Bridge} & \textbf{Final SFT} & \textbf{$\Delta$} \\
+\midrule
+Instruction match rate & 0.06 & 0.12 & +0.06 \\
+All-check pass rate    & 0.06 & 0.12 & +0.06 \\
+Format-valid rate      & 0.32 & 0.36 & +0.04 \\
+Code-parse rate        & 0.00 & 0.33 & +0.33 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Where the model remains weak.}
+Strict structured output (JSON validity) and strict instruction-priority/following remain weak.
+Several broad QA categories also stay flat.
+At higher SFT-token checkpoints, modeling error increases versus bridge, indicating drift.
+
+SFT is a \emph{partial success} with a clear trade-off:
+it improves instruction-format behavior and code-response validity, but does not uniformly improve broad QA and can regress base modeling quality late in training.
+A likely reason is objective mismatch: pre-training is code/math-focused, while part of SFT evaluation targets broader instruction and general knowledge.
+In practice, earlier checkpoints favor capability preservation; later checkpoints favor stricter format compliance.
+
+\section{Limitations and Future Work}
+\label{sec:limitations_future_work}
+
+While our deep-and-narrow architectural approach yielded strong reasoning performance, the model's development was inherently constrained by several practical factors. Primarily, the project was governed by a strict temporal deadline, limiting the total allowable training time to merely a few days. This restrictive wall-clock constraint precluded extended pretraining runs, exhaustive hyperparameter sweeps, or the exploration of alternative data curricula. Furthermore, although our Leonardo HPC allocation provided substantial compute capacity, the restriction to a single 4-GPU node limited our ability to fully leverage advanced 3D parallelism techniques—such as Pipeline or Tensor Parallelism—confining our infrastructure to pure Data Parallelism with gradient accumulation. 
+
+Addressing these constraints forms the foundation of our future work. First, we intend to explore context window extension. Although the current model was constrained to a 1024-token sequence length during training to maximize batch throughput under our memory limits, applying techniques such as RoPE scaling and continuous pretraining on long-document corpora would allow the network to fully utilize its theoretical 2048-token capacity. 
+
+More fundamentally, we intend to shift our training paradigm from building a capable generalist to engineering a dedicated specialist. Rather than simply enriching our current data mixture with additional mathematical and algorithmic content, future iterations will aggressively prune broad-domain web text to actively reduce the model's generalized knowledge base. By intentionally sacrificing universal linguistic competence and broad factual recall, we aim to dedicate the entirety of the model's constrained parameter budget exclusively to domain-specific logical reasoning and mathematical execution. 
+
+Finally, the highly optimized $\sim$492M parameter footprint of our model makes it an ideal candidate for edge computing. Future work will focus on applying post-training quantization (such as 4-bit or 8-bit weight downcasting) and developing a lightweight, local user interface (UI). This will facilitate seamless, offline deployment on consumer hardware and mobile devices, guaranteeing data privacy and zero-latency inference without reliance on cloud infrastructure.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+In this report, we described the development of a 0.5B-parameter LLaMA-style model trained under realistic compute constraints, following the engineering perspective promoted by the Smol Training Playbook. Our main takeaway is that, at the sub-billion scale, performance is shaped less by sheer scale and more by deliberate design choices: we adopt a deep-and-narrow topology to prioritize targeted proficiency in logical reasoning, and we demonstrate that a carefully engineered small model can exhibit strong behavior despite limited capacity. We hope that this work helps make high-quality LLM development more reproducible and accessible, and we plan to extend it with broader evaluation, longer-context experiments, and improved post-training alignment.
+
+\section*{Acknowledgment}
+
+We acknowledge the EuroHPC Joint Undertaking for awarding this project access to the Leonardo supercomputer and its associated resources, hosted by CINECA in Italy.
+
+\begin{thebibliography}{00}
+
+\bibitem{Smol_Playbook}
+HuggingFaceTB, ``The Smol Training Playbook: The Secrets to Building World-Class LLMs,'' \emph{Hugging Face Spaces}, 2025. [Online]. Available: \url{https://huggingface.co/spaces/HuggingFaceTB/smol-playbook-toc}. Accessed: 19-Feb-2026.
+
+\bibitem{nanotron}
+Hugging Face, ``nanotron: Minimalistic large language model 3D-parallelism training,'' \emph{GitHub repository}, 2025. [Online]. Available: \url{https://github.com/huggingface/nanotron}. Accessed: 19-Feb-2026.
+
+\bibitem{original_transformer}
+A.~Vaswani \emph{et al.}, ``Attention is All You Need,'' in \emph{Advances in Neural Information Processing Systems}, vol.~30, 2017.
+
+\bibitem{Llama}
+A.~Dubey \emph{et al.}, ``The Llama 3 Herd of Models,'' \emph{arXiv preprint arXiv:2407.22706}, 2024. [Online]. Available: \url{https://arxiv.org/abs/2407.22706}. Accessed: 19-Feb-2026.
+
+\bibitem{gpt2}
+A.~Radford, J.~Wu, R.~Child, D.~Luan, D.~Amodei, and I.~Sutskever, ``Language Models are Unsupervised Multitask Learners,'' \emph{OpenAI blog}, vol.~1, no.~8, 2019.
+
+\bibitem{subbilion_Lm}
+Z.~Liu \emph{et al.}, ``MobileLLM: Optimizing Sub-billion Parameter Language Models for On-Device Use Cases,'' in \emph{Proceedings of the 41st International Conference on Machine Learning (ICML)}, 2024.
+
+\bibitem{tied_embeddings}
+O.~Press and L.~Wolf, ``Using the Output Embedding to Improve Language Models,'' \emph{arXiv preprint arXiv:1608.05859}, 2016. [Online]. Available: \url{https://arxiv.org/abs/1608.05859}. Accessed: 19-Feb-2026.
+
+\bibitem{gqa}
+J.~Ainslie \emph{et al.}, ``GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints,'' \emph{arXiv preprint arXiv:2305.13245}, 2023. [Online]. Available: \url{https://arxiv.org/abs/2305.13245}. Accessed: 19-Feb-2026.
+
+\bibitem{swiglu}
+N.~Shazeer, ``GLU Variants Improve Transformer,'' \emph{arXiv preprint arXiv:2002.05202}, 2020. [Online]. Available: \url{https://arxiv.org/abs/2002.05202}. Accessed: 19-Feb-2026.
+
+\bibitem{rmsnorm}
+B.~Zhang and R.~Sennrich, ``Root Mean Square Layer Normalization,'' in \emph{Advances in Neural Information Processing Systems}, vol.~32, 2019.
+
+\bibitem{rope}
+J.~Su, Y.~Lu, S.~Pan, A.~Murtadha, B.~Wen, and Y.~Liu, ``RoFormer: Enhanced Transformer with Rotary Position Embedding,'' \emph{arXiv preprint arXiv:2104.09864}, 2021. [Online]. Available: \url{https://arxiv.org/abs/2104.09864}. Accessed: 19-Feb-2026.
+\bibitem{cosmopedia_dataset}
+HuggingFaceTB, ``Cosmopedia,'' \emph{Hugging Face Datasets}, 2024. [Online]. Available: \url{https://huggingface.co/datasets/HuggingFaceTB/cosmopedia}. Accessed: 19-Feb-2026.
+
+\bibitem{zero_paper}
+S. Rajbhandari, J. Rasley, O. Ruwase, and Y. He, ``ZeRO: Memory Optimizations Toward Training Trillion Parameter Models,'' in \emph{Proceedings of the International Conference for High Performance Computing, Networking, Storage and Analysis (SC20)}, 2020.
+
+\bibitem{activation_checkpointing}
+T. Chen, B. Xu, C. Zhang, and C. Guestrin, ``Training Deep Nets with Sublinear Memory Cost,'' \emph{arXiv preprint arXiv:1604.06174}, 2016. [Online]. Available: \url{https://arxiv.org/abs/1604.06174}.
+
+\bibitem{adamw}
+I. Loshchilov and F. Hutter, ``Decoupled Weight Decay Regularization,'' in \emph{International Conference on Learning Representations (ICLR)}, 2019.
+
+\bibitem{cosmopedia_blog}
+Hugging Face, ``How to Create Large-scale Synthetic Data for Pre-training (Cosmopedia),'' 2024. [Online]. Available: \url{https://huggingface.co/blog/cosmopedia}. Accessed: 19-Feb-2026.
+
+\bibitem{slimpajama}
+Cerebras Systems, ``SlimPajama: A 627B token, cleaned and deduplicated version of RedPajama,'' 2023. [Online]. Available: \url{https://www.cerebras.ai/blog/slimpajama-a-627b-token-cleaned-and-deduplicated-version-of-redpajama}. Accessed: 19-Feb-2026.
+
+\bibitem{finewebedu}
+HuggingFaceFW, ``fineweb-edu,'' \emph{Hugging Face Datasets}, 2024. [Online]. Available: \url{https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu}. Accessed: 19-Feb-2026.
+
+\bibitem{fineweb_paper}
+G.~Penedo, H.~Kydl{\'\i}{\v{c}}ek, L.~Ben Allal, A.~Lozhkov, M.~Mitchell, C.~Raffel, L.~von Werra, and T.~Wolf,
+``The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale,''
+\emph{arXiv preprint arXiv:2406.17557}, 2024. [Online]. Available: \url{https://arxiv.org/abs/2406.17557}. Accessed: 19-Feb-2026.
+
+\bibitem{stackexchange_dump}
+Stack Exchange, ``Stack Exchange Data Dump - 2023-03-08,'' \emph{Internet Archive}, 2023. [Online]. Available: \url{https://archive.org/details/stack-exchange-data-dump-2023-03-08}. Accessed: 19-Feb-2026.
+
+\bibitem{stackexchange_process}
+Stack Exchange, ``Announcing a change to the data-dump process,'' \emph{Meta Stack Exchange}, 2024. [Online]. Available: \url{https://meta.stackexchange.com/questions/401324/announcing-a-change-to-the-data-dump-process}. Accessed: 19-Feb-2026.
+
+\bibitem{openmath}
+NVIDIA, ``OpenMathReasoning,'' \emph{Hugging Face Datasets}, 2025. [Online]. Available: \url{https://huggingface.co/datasets/nvidia/OpenMathReasoning}. Accessed: 19-Feb-2026.
+
+\bibitem{openmath_paper}
+I.~Moshkov, D.~Hanley, I.~Sorokin, S.~Toshniwal, C.~Henkel, B.~Schifferer, W.~Du, and I.~Gitman,
+``AIMO-2 Winning Solution: Building State-of-the-Art Mathematical Reasoning Models with OpenMathReasoning dataset,''
+\emph{arXiv preprint arXiv:2504.16891}, 2025. [Online]. Available: \url{https://arxiv.org/abs/2504.16891}. Accessed: 19-Feb-2026.
+
+\bibitem{instructgpt}
+L.~Ouyang \emph{et al.}, ``Training language models to follow instructions with human feedback,'' in \emph{Advances in Neural Information Processing Systems}, vol.~35, pp.~27730--27744, 2022.
+
+\bibitem{starcoderdata}
+BigCode, ``StarCoder Training Dataset (starcoderdata),'' \emph{Hugging Face Datasets}, 2023. [Online]. Available: \url{https://huggingface.co/datasets/bigcode/starcoderdata}. Accessed: 19-Feb-2026.
+
+\bibitem{starcoder_paper}
+R.~Li \emph{et al.}, ``StarCoder: may the source be with you!'' \emph{arXiv preprint arXiv:2305.06161}, 2023. [Online]. Available: \url{https://arxiv.org/abs/2305.06161}. Accessed: 19-Feb-2026.
+
+\bibitem{smol_smoltalk_dataset}
+HuggingFaceTB, ``HuggingFaceTB/smol-smoltalk,'' Hugging Face Datasets, 2025. [Online]. Available: \url{https://huggingface.co/datasets/HuggingFaceTB/smol-smoltalk}. Accessed: 19-Feb-2026.
+
+\bibitem{smollm2_paper}
+L.~Ben~Allal \emph{et al.}, ``SmolLM2: When Smol Goes Big -- Data-Centric Training of a Small Language Model,'' \emph{arXiv preprint arXiv:2502.02737}, 2025. [Online]. Available: \url{https://arxiv.org/abs/2502.02737}. Accessed: 19-Feb-2026.
+
+\bibitem{huang2025fapm}
+W.~Huang, A.~Cheng, and Y.~Wang, ``Mitigating Catastrophic Forgetting in Large Language Models with Forgetting-aware Pruning,'' in \emph{Proc. of the 2025 Conference on Empirical Methods in Natural Language Processing (EMNLP)}, Suzhou, China, Nov.~2025, pp.~21842--21856, doi: 10.18653/v1/2025.emnlp-main.1108.
+
+\bibitem{llama3_prompt_format_docs}
+Meta, ``Llama 3 | Model Cards and Prompt formats (Prompt format and special tokens),'' Meta Llama Documentation, n.d. [Online]. Available: \url{https://www.llama.com/docs/model-cards-and-prompt-formats/meta-llama-3/}. Accessed: 19-Feb-2026.
+
+\bibitem{eval_c4}
+C.~Raffel \emph{et al.}, ``Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer,'' \emph{JMLR}, vol.~21, no.~140, pp.~1--67, 2020.
+
+\bibitem{eval_codeparrot}
+Hugging Face, ``codeparrot/codeparrot-clean,'' \emph{Hugging Face Datasets}, 2021. [Online]. Available: \url{https://huggingface.co/datasets/codeparrot/codeparrot-clean}. Accessed: 19-Feb-2026.
+
+\bibitem{eval_wikitext}
+S.~Merity, C.~Xiong, J.~Bradbury, and R.~Socher, ``Pointer Sentinel Mixture Models,'' in \emph{Proc. ICLR}, 2017.
+
+\bibitem{eval_finemath}
+HuggingFaceTB, ``finemath,'' \emph{Hugging Face Datasets}, 2024. [Online]. Available: \url{https://huggingface.co/datasets/HuggingFaceTB/finemath}. Accessed: 19-Feb-2026.
+
+\bibitem{eval_wikipedia}
+Wikimedia Foundation, ``wikimedia/wikipedia,'' \emph{Hugging Face Datasets}, 2023. [Online]. Available: \url{https://huggingface.co/datasets/wikimedia/wikipedia}. Accessed: 19-Feb-2026.
+
+\bibitem{eval_stackv2edu}
+common-pile, ``stackv2\_edu\_filtered,'' \emph{Hugging Face Datasets}, 2024. [Online]. Available: \url{https://huggingface.co/datasets/common-pile/stackv2_edu_filtered}. Accessed: 19-Feb-2026.
+
+\bibitem{eval_starcoder2extras}
+BigCode, ``starcoder2data-extras,'' \emph{Hugging Face Datasets}, 2024. [Online]. Available: \url{https://huggingface.co/datasets/bigcode/starcoder2data-extras}. Accessed: 19-Feb-2026.
+
+\bibitem{eval_openmathinstruct1}
+NVIDIA, ``OpenMathInstruct-1,'' \emph{Hugging Face Datasets}, 2025. [Online]. Available: \url{https://huggingface.co/datasets/nvidia/OpenMathInstruct-1}. Accessed: 19-Feb-2026.
+
+\bibitem{eval_opencodereasoning}
+NVIDIA, ``OpenCodeReasoning,'' \emph{Hugging Face Datasets}, 2025. [Online]. Available: \url{https://huggingface.co/datasets/nvidia/OpenCodeReasoning}. Accessed: 19-Feb-2026.
+
+\bibitem{eval_arc}
+P.~Clark \emph{et al.}, ``Think you have Solved Question Answering? Try ARC, the AI2 Reasoning Challenge,'' \emph{arXiv preprint arXiv:1803.05457}, 2018.
+
+\bibitem{eval_openbookqa}
+T.~Mihaylov, P.~Clark, T.~Khot, and A.~Sabharwal, ``Can a Suit of Armor Conduct Electricity? A New Dataset for Open Book Question Answering,'' in \emph{Proc. EMNLP}, 2018.
+
+\bibitem{eval_qasc}
+P.~Khot \emph{et al.}, ``QASC: A Dataset for Question Answering via Sentence Composition,'' in \emph{Proc. AAAI}, 2020.
+
+\bibitem{eval_sciq}
+T.~M.~A. Welbl, N.~F. Liu, and M.~Gardner, ``Crowdsourcing Multiple Choice Science Questions,'' in \emph{Proc. Workshop on Noisy User-generated Text (W-NUT)}, 2017.
+
+\bibitem{eval_commonsenseqa}
+A.~Talmor, J.~Herzig, N.~Lourie, and J.~Berant, ``CommonsenseQA: A Question Answering Challenge Targeting Commonsense Knowledge,'' in \emph{Proc. NAACL-HLT}, 2019.
+
+\bibitem{eval_hellaswag}
+R.~Zellers \emph{et al.}, ``HellaSwag: Can a Machine Really Finish Your Sentence?'' in \emph{Proc. ACL}, 2019.
+
+\bibitem{eval_socialiqa}
+M.~Sap \emph{et al.}, ``Social IQa: Commonsense Reasoning about Social Interactions,'' in \emph{Proc. EMNLP-IJCNLP}, 2019.
+
+\bibitem{eval_superglue}
+A.~Wang \emph{et al.}, ``SuperGLUE: A Stickier Benchmark for General-Purpose Language Understanding Systems,'' in \emph{Advances in Neural Information Processing Systems}, vol.~32, 2019.
+
+\bibitem{eval_piqa}
+Y.~Bisk \emph{et al.}, ``PIQA: Reasoning about Physical Commonsense in Natural Language,'' in \emph{Proc. AAAI}, 2020.
+
+\bibitem{eval_winogrande}
+K.~Sakaguchi, R.~L. Bras, C.~Bhagavatula, and Y.~Choi, ``WinoGrande: An Adversarial Winograd Schema Challenge at Scale,'' in \emph{Proc. AAAI}, 2020.
+
+\bibitem{eval_mmlu}
+D.~Hendrycks \emph{et al.}, ``Measuring Massive Multitask Language Understanding,'' in \emph{Proc. ICLR}, 2021.
+
+\bibitem{smollm3_hf}
+HuggingFaceTB, ``SmolLM3-3B,'' \emph{Hugging Face Models}, 2025. [Online]. Available: \url{https://huggingface.co/HuggingFaceTB/SmolLM3-3B}. Accessed: 19-Feb-2026.
+
+\bibitem{smollm_corpus}
+L.~Ben Allal, A.~Lozhkov, G.~Penedo, T.~Wolf, and L.~von Werra, ``SmolLM-Corpus,'' \emph{Hugging Face Datasets}, 2024. [Online]. Available: \url{https://huggingface.co/datasets/HuggingFaceTB/smollm-corpus}. Accessed: 19-Feb-2026.
+
+\bibitem{pythia}
+S. Biderman \emph{et al.}, ``Pythia: A Suite for Analyzing Large Language Models Across Training and Scaling,'' in \emph{Proceedings of the 40th International Conference on Machine Learning (ICML)}, 2023.
+
+\end{thebibliography}
+\vspace{12pt}
+
+\end{document}

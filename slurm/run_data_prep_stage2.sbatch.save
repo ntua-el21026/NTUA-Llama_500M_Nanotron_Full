@@ -1,0 +1,121 @@
+#!/bin/bash
+#SBATCH --job-name=prep_6B
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=29000MB
+#SBATCH --time=04:00:00
+#SBATCH --partition=lrd_all_serial
+#SBATCH --gres=tmpfs:10g
+#SBATCH --output=logs/prep_%j.out
+#SBATCH --error=logs/prep_%j.err
+
+# Χρήση:
+# sbatch run_prep_6B.sbatch <KIND> <SKIP> <LIMIT> <PART_ID>
+#
+# KIND:
+#   math         ->  open-web-math/open-web-math (column=text)
+#   code_py      ->  bigcode/starcoderdata (data_dir=python, column=content)
+#   fwe          ->  HuggingFaceFW/fineweb-edu (column=text, + optional CONFIG)
+#
+# Για fwe μπορείς προαιρετικά να δώσεις CONFIG μέσα από env var:
+#   sbatch --export=ALL,FWE_CONFIG=CC-MAIN-2025-26 run_prep_6B.sbatch fwe 0 200000 000
+
+cd /leonardo/home/userexternal/mpeppas0/Smol_Project
+
+KIND=$1
+SKIP=$2
+LIMIT=$3
+PART_ID=$4
+
+module load python/3.11
+source /leonardo_scratch/large/userexternal/mpeppas0/venvs/nanotron/bin/activate
+export HF_HOME="/leonardo_scratch/large/userexternal/mpeppas0/hf_cache"
+export OMP_NUM_THREADS=4
+
+# (Προαιρετικό αλλά βοηθάει για gated datasets όπως StarCoderData)
+# export HF_TOKEN="xxxxxxxxxxxxxxxxxxxx"
+
+BASE_OUT="/leonardo_scratch/large/userexternal/mpeppas0/nanoset_6B"
+
+case "$KIND" in
+  math)
+    OUTPUT_DIR="$BASE_OUT/openmath/part_${PART_ID}"
+    DATASET="open-web-math/open-web-math"
+    SPLIT="train"
+    COLUMN="text"
+
+    mkdir -p "$OUTPUT_DIR"
+    echo "KIND=math | DATASET=$DATASET | Split=$SPLIT | Column=$COLUMN | Skip=$SKIP | Limit=$LIMIT"
+
+    python scripts/prepare_dataset_stage2.py \
+      --tokenizer-name-or-path meta-llama/Meta-Llama-3-8B \
+      --output-folder "$OUTPUT_DIR" \
+      --n-tasks 4 \
+      --skip "$SKIP" \
+      --limit "$LIMIT" \
+      hf \
+      --dataset "$DATASET" \
+      --split "$SPLIT" \
+      --column "$COLUMN"
+    ;;
+
+  code_py)
+    OUTPUT_DIR="$BASE_OUT/starcoder_py/part_${PART_ID}"
+    DATASET="bigcode/starcoderdata"
+    SPLIT="train"
+    COLUMN="content"
+    DATA_DIR="python"
+
+    mkdir -p "$OUTPUT_DIR"
+    echo "KIND=code_py | DATASET=$DATASET | data_dir=$DATA_DIR | Split=$SPLIT | Column=$COLUMN | Skip=$SKIP | Limit=$LIMIT"
+
+    python scripts/prepare_dataset_stage2.py \
+      --tokenizer-name-or-path meta-llama/Meta-Llama-3-8B \
+      --output-folder "$OUTPUT_DIR" \
+      --n-tasks 4 \
+      --skip "$SKIP" \
+      --limit "$LIMIT" \
+      hf \
+      --dataset codeparrot/github-code \
+      --split train \
+      --column code \
+      --languages Python
+    ;;
+
+  fwe)
+    OUTPUT_DIR="$BASE_OUT/fineweb_edu/part_${PART_ID}"
+    DATASET="HuggingFaceFW/fineweb-edu"
+    SPLIT="train"
+    COLUMN="text"
+
+    # Προαιρετικό config (π.χ. CC-MAIN-2025-26) για να πάρεις “νεότερα” snapshots.
+    # Αν δεν το δώσεις, απλά διαβάζει το default.
+    CONFIG_ARG=()
+    if [[ -n "${FWE_CONFIG:-}" ]]; then
+      CONFIG_ARG=( --config "$FWE_CONFIG" )
+      echo "Using FWE_CONFIG=$FWE_CONFIG"
+    fi
+
+    mkdir -p "$OUTPUT_DIR"
+    echo "KIND=fwe | DATASET=$DATASET | Split=$SPLIT | Column=$COLUMN | Skip=$SKIP | Limit=$LIMIT"
+
+    python scripts/prepare_dataset_stage2.py \
+      --tokenizer-name-or-path meta-llama/Meta-Llama-3-8B \
+      --output-folder "$OUTPUT_DIR" \
+      --n-tasks 4 \
+      --skip "$SKIP" \
+      --limit "$LIMIT" \
+      hf \
+      --dataset "$DATASET" \
+      "${CONFIG_ARG[@]}" \
+      --split "$SPLIT" \
+      --column "$COLUMN"
+    ;;
+
+  *)
+    echo "ERROR: Unknown KIND='$KIND'. Use: math | code_py | fwe"
+    exit 1
+    ;;
+esac
+
